@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#f6f1e3"/>
+  <rect x="7" y="9" width="50" height="46" rx="7" fill="#fffdf6" stroke="#e3d9c0" stroke-width="2.5"/>
+  <line x1="7" y1="21" x2="57" y2="21" stroke="#bcd4e6" stroke-width="2"/>
+  <line x1="7" y1="32" x2="57" y2="32" stroke="#bcd4e6" stroke-width="2"/>
+  <line x1="7" y1="43" x2="57" y2="43" stroke="#bcd4e6" stroke-width="2"/>
+  <line x1="20" y1="9" x2="20" y2="55" stroke="#e08a7d" stroke-width="2.5"/>
+  <text x="38" y="42" font-family="serif" font-size="30" fill="#234f75" text-anchor="middle">漢</text>
+</svg>
