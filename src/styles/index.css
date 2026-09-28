@@ -1,0 +1,9 @@
+/* ==========================================================================
+   Kanji Notebook — kumpulan gaya (dipecah per-komponen)
+   ========================================================================== */
+@import './layout.css';
+@import './flashcard.css';
+@import './quiz.css';
+@import './dashboard.css';
+@import './responsive.css';
+@import './dark.css';

@@ -44,12 +44,27 @@ Buka `http://localhost:5173`.
 ```
 src/
   data/kosakata.js             # Data 613 kosakata JFT (urut sesuai docx)
-  hooks/useProgress.js         # Simpan progres ke localStorage
-  hooks/useTheme.js            # Mode terang/gelap
-  hooks/useSpeech.js           # Pelafalan Jepang (Web Speech API)
-  components/Flashcard.jsx     # Mode hafalan kartu berurutan
-  components/Quiz.jsx          # Mode kuis pilihan ganda
-  components/SpeakerButton.jsx # Tombol pelafalan (audio)
-  App.jsx                      # Kerangka buku + navigasi tab
-  index.css / App.css          # Tema "kertas"
+  hooks/                       # useProgress, useTheme, useSpeech, useFont
+  utils/                       # meanings.js, quiz.js (logika bersama)
+  components/
+    Icon.jsx                   # Ikon SVG seragam
+    NotebookHeader.jsx         # Kepala buku + pemilih font/tema + badge
+    TabNav.jsx                 # Navigasi tab
+    ProgressStrip.jsx          # Strip progres
+    Dashboard.jsx              # Ringkasan progres (+ Stat)
+    Flashcard.jsx              # Penyusun mode hafalan
+    Quiz.jsx                   # Penyusun mode kuis
+    SpeakerButton.jsx          # Tombol pelafalan (audio)
+    flashcard/                 # Sub-komponen: Front, Back, JumpList, Controls
+    quiz/                      # Sub-komponen: Options, Feedback, Result, Icons
+  styles/                      # CSS modular:
+    layout.css                 #   kerangka buku, header, tab, footer
+    flashcard.css              #   mode hafalan
+    quiz.css                   #   mode kuis
+    dashboard.css              #   dashboard progres
+    responsive.css             #   tata letak responsif
+    dark.css                   #   penyesuaian mode gelap
+    index.css                  #   pengimpor semua gaya
+  App.jsx                      # Rangkaian utama (ringkas)
+  index.css                    # Tema dasar "kertas" + token warna/font
 ```

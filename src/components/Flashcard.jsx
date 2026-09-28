@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import SpeakerButton from './SpeakerButton.jsx'
+import FlashcardFront from './flashcard/FlashcardFront.jsx'
+import FlashcardBack from './flashcard/FlashcardBack.jsx'
+import JumpList from './flashcard/JumpList.jsx'
+import FlashcardControls from './flashcard/FlashcardControls.jsx'
 
 /**
  * Mode hafalan kartu BERURUTAN: satu kosakata per kartu, bisa dibalik
@@ -84,8 +87,9 @@ function Flashcard({
 
   const progress = total > 0 ? ((safeIndex + 1) / total) * 100 : 0
   const isKnown = status === 'known'
-  const speakWord = () => onSpeak?.(item.kata)
-  const speakReading = () => onSpeak?.(item.baca)
+  // Selalu bacakan CARA BACA (furigana) agar pengucapan akurat,
+  // karena TTS sering salah bila membaca kanji langsung.
+  const speakWord = () => onSpeak?.(item.baca || item.kata)
 
   return (
     <section className="flashcard" aria-label="Mode hafalan kartu">
@@ -123,159 +127,45 @@ function Flashcard({
           }
         >
           <div className="flashcard-inner">
-            <div className="flashcard-face flashcard-front" aria-hidden={flipped}>
-              <span className="flashcard-kanji" lang="ja">
-                {item.kata}
-              </span>
-              {speechSupported && hasJapaneseVoice ? (
-                <div className="flashcard-audio">
-                  <SpeakerButton
-                    onClick={speakWord}
-                    supported={speechSupported}
-                    japanese={hasJapaneseVoice}
-                    label={`Dengarkan pelafalan ${item.kata}`}
-                    className="speak-btn-lg"
-                  />
-                </div>
-              ) : null}
-              <span className="flashcard-hint">Klik untuk melihat arti</span>
-            </div>
+            <FlashcardFront
+              kata={item.kata}
+              flipped={flipped}
+              onSpeak={speakWord}
+              speechSupported={speechSupported}
+              hasJapaneseVoice={hasJapaneseVoice}
+            />
 
-            <div className="flashcard-face flashcard-back" aria-hidden={!flipped}>
-              <h2 className="flashcard-back-title" lang="ja">
-                {item.kata}
-              </h2>
-              <dl className="flashcard-details">
-                <div className="flashcard-detail">
-                  <dt>Bacaan</dt>
-                  <dd lang="ja" className="flashcard-detail-baca">
-                    <span>{item.baca}</span>
-                    <SpeakerButton
-                      onClick={speakReading}
-                      supported={speechSupported}
-                      japanese={hasJapaneseVoice}
-                      label={`Dengarkan bacaan ${item.baca}`}
-                      className="speak-btn-inline"
-                    />
-                  </dd>
-                </div>
-                <div className="flashcard-detail">
-                  <dt>Arti</dt>
-                  <dd>{item.arti}</dd>
-                </div>
-                <div className="flashcard-detail">
-                  <dt>Nomor</dt>
-                  <dd>#{item.id}</dd>
-                </div>
-              </dl>
-            </div>
+            <FlashcardBack
+              item={item}
+              flipped={flipped}
+              onSpeak={speakWord}
+              speechSupported={speechSupported}
+              hasJapaneseVoice={hasJapaneseVoice}
+            />
           </div>
         </div>
 
-        <aside className="flashcard-sidebar" aria-label="Lompat ke kosakata">
-          <h3 className="flashcard-sidebar-title">
-            <svg
-              className="flashcard-sidebar-icon"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M4 6h16M4 12h16M4 18h10" />
-            </svg>
-            Lompat Cepat
-          </h3>
-          <ol className="flashcard-jump-list">
-            {items.map((it, i) => {
-              const s = statusFor ? statusFor(it.id) : 'new'
-              const isCurrent = i === safeIndex
-              return (
-                <li key={it.id}>
-                  <button
-                    type="button"
-                    className={`flashcard-jump flashcard-jump-${s} ${
-                      isCurrent ? 'is-current' : ''
-                    }`}
-                    onClick={() => onJump?.(i)}
-                    aria-current={isCurrent ? 'true' : undefined}
-                    aria-label={`Lompat ke kosakata nomor ${i + 1}${
-                      s === 'known'
-                        ? ', sudah hafal'
-                        : s === 'learning'
-                          ? ', sedang belajar'
-                          : ''
-                    }${isCurrent ? ', sedang ditampilkan' : ''}`}
-                  >
-                    {i + 1}
-                  </button>
-                </li>
-              )
-            })}
-          </ol>
-        </aside>
+        <JumpList
+          items={items}
+          safeIndex={safeIndex}
+          statusFor={statusFor}
+          onJump={onJump}
+        />
       </div>
 
-      <div className="flashcard-controls">
-        <button
-          type="button"
-          className="flashcard-btn flashcard-btn-prev"
-          onClick={onPrev}
-          disabled={safeIndex === 0}
-          aria-label="Kosakata sebelumnya"
-        >
-          ‹ Sebelumnya
-        </button>
-
-        <button
-          type="button"
-          ref={flipButtonRef}
-          className="flashcard-btn flashcard-btn-flip"
-          onClick={toggleFlip}
-          aria-label={flipped ? 'Sembunyikan arti' : 'Balik kartu untuk melihat arti'}
-        >
-          {flipped ? 'Sembunyikan Arti' : 'Balik Kartu'}
-        </button>
-
-        <button
-          type="button"
-          className={`flashcard-btn flashcard-btn-known ${
-            isKnown ? 'is-known' : ''
-          }`}
-          onClick={() => onToggleKnown?.(item.id)}
-          aria-pressed={isKnown}
-          aria-label={
-            isKnown
-              ? `Batalkan tanda hafal untuk ${item.kata}`
-              : `Tandai ${item.kata} sudah hafal`
-          }
-        >
-          {isKnown ? '★ Hafal' : '☆ Tandai Hafal'}
-        </button>
-
-        <button
-          type="button"
-          className="flashcard-btn flashcard-btn-learning"
-          onClick={() => onMarkLearning?.(item.id)}
-          aria-label={`Tandai ${item.kata} sedang dipelajari`}
-        >
-          Tandai Sedang Belajar
-        </button>
-
-        <button
-          type="button"
-          className="flashcard-btn flashcard-btn-next"
-          onClick={onNext}
-          disabled={safeIndex >= total - 1}
-          aria-label="Kosakata berikutnya"
-        >
-          Berikutnya ›
-        </button>
-      </div>
+      <FlashcardControls
+        item={item}
+        safeIndex={safeIndex}
+        total={total}
+        flipped={flipped}
+        isKnown={isKnown}
+        flipButtonRef={flipButtonRef}
+        onPrev={onPrev}
+        onNext={onNext}
+        onToggleFlip={toggleFlip}
+        onToggleKnown={onToggleKnown}
+        onMarkLearning={onMarkLearning}
+      />
     </section>
   )
 }

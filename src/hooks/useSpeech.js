@@ -1,8 +1,23 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 /**
- * Pelafalan kanji/kosakata memakai Web Speech API (speechSynthesis).
- * Membaca teks dengan suara bahasa Jepang (ja-JP) bila tersedia.
+ * Mengubah tulisan cara baca (furigana) menjadi teks yang enak dibacakan TTS:
+ * - buang tanda bantu ～ 〜 ~ (penanda imbuhan)
+ * - bila ada beberapa pilihan (dipisah 、／/), ambil yang pertama
+ * - rapikan spasi
+ */
+export function toSpeakable(reading) {
+  if (!reading) return ''
+  return String(reading)
+    .replace(/[～〜~]/g, '')
+    .split(/[、,／/]/)[0]
+    .replace(/[（）()]/g, '')
+    .trim()
+}
+
+/**
+ * Pelafalan Jepang memakai Web Speech API (speechSynthesis).
+ * Utamakan cara baca (furigana) yang sudah akurat, bukan teks kanji.
  *
  * @param {string} lang - kode bahasa, default 'ja-JP'
  */
@@ -38,13 +53,16 @@ export function useSpeech(lang = 'ja-JP') {
 
   const speak = useCallback(
     (text) => {
-      if (!supported || !text) return
+      if (!supported) return
+      // Bersihkan teks: buang simbol imbuhan & ambil cara baca pertama.
+      const clean = toSpeakable(text)
+      if (!clean) return
       const synth = window.speechSynthesis
       synth.cancel() // hentikan bacaan sebelumnya agar tidak menumpuk
-      const utterance = new SpeechSynthesisUtterance(text)
+      const utterance = new SpeechSynthesisUtterance(clean)
       utterance.lang = lang
       if (voice) utterance.voice = voice
-      utterance.rate = 0.9 // sedikit pelan untuk hafalan
+      utterance.rate = 0.85 // sedikit pelan untuk hafalan
       utterance.pitch = 1
       synth.speak(utterance)
     },

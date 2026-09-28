@@ -1,0 +1,130 @@
+/* ==========================================================================
+   Responsif — tablet kecil & ponsel
+   ========================================================================== */
+@media (max-width: 760px) {
+  .notebook {
+    margin-left: 22px;
+    padding: 20px 16px;
+  }
+
+  .notebook-spiral {
+    left: -22px;
+    width: 22px;
+  }
+
+  .notebook-ring {
+    width: 20px;
+    height: 12px;
+  }
+
+  .flashcard-main {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* Panel lompat cepat di mobile: tidak lagi sticky & tidak terpotong. */
+  .flashcard-sidebar {
+    order: 2;
+    position: static;
+    max-height: none;
+  }
+
+  .flashcard-jump-list {
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+    /* Tinggi menyesuaikan isi; scroll hanya bila daftar sangat panjang. */
+    max-height: min(48vh, 340px);
+    overflow-y: auto;
+  }
+
+  .notebook-head-actions {
+    width: 100%;
+    justify-content: space-between;
+    order: 3;
+  }
+
+  .flashcard-detail {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .flashcard-detail dt {
+    font-size: 1.1rem;
+  }
+
+  .notebook-badge {
+    transform: rotate(0);
+  }
+
+  .foot-note {
+    display: none;
+  }
+}
+
+@media (max-width: 460px) {
+  body {
+    font-size: 17px;
+  }
+
+  .notebook {
+    margin-left: 16px;
+    padding: 16px 12px;
+  }
+
+  .notebook-head {
+    gap: 12px;
+  }
+
+  .notebook-title {
+    gap: 10px;
+  }
+
+  .notebook-title-icon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .theme-toggle {
+    width: 46px;
+    height: 46px;
+  }
+
+  .notebook-head-actions {
+    gap: 10px;
+  }
+
+  /* Tombol lompat cepat: penuh, rapi, tidak terpotong. */
+  .flashcard-jump-list {
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    gap: 6px;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .flashcard-jump {
+    font-size: 0.9rem;
+    border-radius: 8px;
+  }
+
+  .flashcard-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+  }
+
+  .flashcard-btn {
+    width: 100%;
+    padding: 12px 10px;
+    font-size: 0.98rem;
+  }
+
+  /* Tombol "Balik Kartu" jadi unggulan, seluruh lebar. */
+  .flashcard-btn-flip {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+
+  .notebook-title h1 {
+    font-size: 1.75rem;
+  }
+}

@@ -1,74 +1,9 @@
 import { useCallback, useMemo, useState } from 'react'
 import SpeakerButton from './SpeakerButton.jsx'
-
-const SESSION_SIZE = 10
-const OPTION_COUNT = 4
-
-function shuffle(list) {
-  const result = [...list]
-  for (let i = result.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[result[i], result[j]] = [result[j], result[i]]
-  }
-  return result
-}
-
-function buildSession(items, size) {
-  return shuffle(items).slice(0, Math.min(size, items.length))
-}
-
-function buildOptions(item, pool, count) {
-  const distractors = []
-  const seen = new Set([item.arti])
-  for (const candidate of shuffle(pool)) {
-    if (candidate.id === item.id) continue
-    if (seen.has(candidate.arti)) continue
-    seen.add(candidate.arti)
-    distractors.push(candidate.arti)
-    if (distractors.length === count - 1) break
-  }
-  return shuffle([item.arti, ...distractors])
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      className="quiz-icon"
-      viewBox="0 0 24 24"
-      width="20"
-      height="20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      role="presentation"
-      aria-hidden="true"
-    >
-      <path d="M4 12.5 9.5 18 20 6.5" />
-    </svg>
-  )
-}
-
-function CrossIcon() {
-  return (
-    <svg
-      className="quiz-icon"
-      viewBox="0 0 24 24"
-      width="20"
-      height="20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      role="presentation"
-      aria-hidden="true"
-    >
-      <path d="M6 6l12 12M18 6 6 18" />
-    </svg>
-  )
-}
+import QuizOptions from './quiz/QuizOptions.jsx'
+import QuizFeedback from './quiz/QuizFeedback.jsx'
+import QuizResult from './quiz/QuizResult.jsx'
+import { SESSION_SIZE, OPTION_COUNT, buildSession, buildOptions } from '../utils/quiz.js'
 
 function Quiz({
   items = [],
@@ -153,23 +88,7 @@ function Quiz({
   }
 
   if (isFinished) {
-    const percentage = session.length
-      ? Math.round((score / session.length) * 100)
-      : 0
-    return (
-      <div className="quiz">
-        <div className="quiz-card quiz-summary">
-          <h2 className="quiz-summary-title">Kuis Selesai</h2>
-          <p className="quiz-summary-score">
-            Skor akhir: <strong>{score}</strong> / {session.length}
-          </p>
-          <p className="quiz-summary-detail">Ketepatan: {percentage}%</p>
-          <button type="button" className="quiz-restart" onClick={restart}>
-            Main Lagi
-          </button>
-        </div>
-      </div>
-    )
+    return <QuizResult score={score} total={session.length} onRestart={restart} />
   }
 
   if (!current) {
@@ -196,10 +115,10 @@ function Quiz({
           </span>
           {speechSupported && hasJapaneseVoice ? (
             <SpeakerButton
-              onClick={() => onSpeak?.(current.kata)}
+              onClick={() => onSpeak?.(current.baca || current.kata)}
               supported={speechSupported}
               japanese={hasJapaneseVoice}
-              label={`Dengarkan pelafalan ${current.kata}`}
+              label={`Dengarkan pelafalan ${current.baca || current.kata}`}
               className="speak-btn-lg"
             />
           ) : null}
@@ -212,70 +131,20 @@ function Quiz({
 
         <h2 className="quiz-question">Apa arti kosakata di atas?</h2>
 
-        <ul className="quiz-options">
-          {options.map((option) => {
-            const isCorrectOption = option === correctAnswer
-            const isChosen = selected === option
-            const classes = ['quiz-option']
-            if (isAnswered && isCorrectOption) classes.push('correct')
-            if (isAnswered && isChosen && !isCorrectOption) classes.push('wrong')
-
-            return (
-              <li key={option} className="quiz-option-item">
-                <button
-                  type="button"
-                  className={classes.join(' ')}
-                  onClick={() => handleAnswer(option)}
-                  disabled={isAnswered}
-                  aria-label={`Jawaban: ${option}${
-                    isAnswered && isCorrectOption ? ', jawaban benar' : ''
-                  }${
-                    isAnswered && isChosen && !isCorrectOption
-                      ? ', jawaban salah'
-                      : ''
-                  }`}
-                >
-                  <span className="quiz-option-label">{option}</span>
-                  {isAnswered && isCorrectOption ? (
-                    <>
-                      <CheckIcon />
-                      <span className="sr-only">jawaban benar</span>
-                    </>
-                  ) : null}
-                  {isAnswered && isChosen && !isCorrectOption ? (
-                    <>
-                      <CrossIcon />
-                      <span className="sr-only">jawaban salah</span>
-                    </>
-                  ) : null}
-                </button>
-              </li>
-            )
-          })}
-        </ul>
+        <QuizOptions
+          options={options}
+          correctAnswer={correctAnswer}
+          selected={selected}
+          isAnswered={isAnswered}
+          onAnswer={handleAnswer}
+        />
 
         {isAnswered ? (
-          <div className="quiz-feedback">
-            <p
-              className={
-                selected === correctAnswer
-                  ? 'quiz-feedback-text correct'
-                  : 'quiz-feedback-text wrong'
-              }
-            >
-              {selected === correctAnswer
-                ? 'Jawaban benar.'
-                : `Jawaban salah. Arti yang benar: ${correctAnswer}`}
-            </p>
-            <button
-              type="button"
-              className="quiz-next"
-              onClick={handleNext}
-              aria-label="Lanjut ke soal berikutnya"
-            >
-              Soal Berikutnya
-            </button>
-          </div>
+          <QuizFeedback
+            isCorrect={selected === correctAnswer}
+            correctAnswer={correctAnswer}
+            onNext={handleNext}
+          />
         ) : null}
       </div>
 

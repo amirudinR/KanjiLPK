@@ -77,6 +77,28 @@
     0 6px 14px -8px rgba(0, 0, 0, 0.6);
 }
 
+/* ==========================================================================
+   Pilihan gaya font — diubah lewat <html data-font="...">
+   Setiap opsi menata ulang font judul (hand), isi (note), dan kanji (jp).
+   ========================================================================== */
+:root[data-font='clean'] {
+  --font-hand: 'Nunito', 'Segoe UI', sans-serif;
+  --font-note: 'Nunito', 'Segoe UI', sans-serif;
+  --font-jp: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+}
+
+:root[data-font='rounded'] {
+  --font-hand: 'Zen Maru Gothic', 'Segoe UI', sans-serif;
+  --font-note: 'Nunito', 'Segoe UI', sans-serif;
+  --font-jp: 'Zen Maru Gothic', 'Hiragino Kaku Gothic ProN', sans-serif;
+}
+
+:root[data-font='hand'] {
+  --font-hand: 'Gloria Hallelujah', 'Caveat', cursive;
+  --font-note: 'Gloria Hallelujah', 'Patrick Hand', cursive;
+  --font-jp: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', sans-serif;
+}
+
 *,
 *::before,
 *::after {
