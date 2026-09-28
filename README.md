@@ -9,6 +9,8 @@ Aplikasi web untuk menghafal **kanji JLPT N5 secara berurutan**, dengan desain b
 - **Kuis pilihan ganda** — 10 soal acak per sesi, dengan skor dan ringkasan akhir.
 - **Simpan progres otomatis** — tandai kanji "sudah hafal" / "sedang belajar"; tersimpan di `localStorage` browser.
 - **Dashboard progres** — ringkasan jumlah kanji hafal, sedang belajar, dan belum hafal.
+- **Mode gelap** — tombol terang/gelap di header, ikut preferensi sistem, pilihan tersimpan otomatis.
+- **Lompat cepat** — grid nomor kanji untuk pindah langsung; responsif di layar ponsel.
 - **Desain kertas** — latar buku bergaris, spiral, font tulisan tangan, kartu flip 3D.
 
 ## Data

@@ -1,9 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#f6f1e3"/>
-  <rect x="7" y="9" width="50" height="46" rx="7" fill="#fffdf6" stroke="#e3d9c0" stroke-width="2.5"/>
-  <line x1="7" y1="21" x2="57" y2="21" stroke="#bcd4e6" stroke-width="2"/>
-  <line x1="7" y1="32" x2="57" y2="32" stroke="#bcd4e6" stroke-width="2"/>
-  <line x1="7" y1="43" x2="57" y2="43" stroke="#bcd4e6" stroke-width="2"/>
-  <line x1="20" y1="9" x2="20" y2="55" stroke="#e08a7d" stroke-width="2.5"/>
-  <text x="38" y="42" font-family="serif" font-size="30" fill="#234f75" text-anchor="middle">漢</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8f3e6"/>
+      <stop offset="1" stop-color="#e9dfc5"/>
+    </linearGradient>
+    <linearGradient id="page" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fffdf6"/>
+      <stop offset="1" stop-color="#f3ecd8"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="1.4" dy="2.4" stdDeviation="1.6" flood-color="#7a5f2a" flood-opacity="0.38"/>
+    </filter>
+  </defs>
+
+  <!-- papan meja lembut -->
+  <rect width="64" height="64" rx="15" fill="url(#bg)"/>
+
+  <!-- tumpukan kertas di belakang -->
+  <rect x="15.5" y="11.5" width="41" height="41" rx="6"
+        fill="#efe6cf" stroke="#d8caa6" stroke-width="1.4"
+        transform="rotate(4 36 32)"/>
+
+  <!-- halaman buku -->
+  <g filter="url(#soft)">
+    <rect x="12.5" y="9.5" width="41" height="45" rx="6" fill="url(#page)"
+          stroke="#e2d6b8" stroke-width="1.6"/>
+  </g>
+
+  <!-- garis kertas -->
+  <g stroke="#bcd4e6" stroke-width="1.7" stroke-linecap="round">
+    <line x1="12.5" y1="21" x2="53.5" y2="21"/>
+    <line x1="12.5" y1="30" x2="53.5" y2="30"/>
+    <line x1="12.5" y1="39" x2="53.5" y2="39"/>
+    <line x1="12.5" y1="48" x2="53.5" y2="48"/>
+  </g>
+
+  <!-- margin merah -->
+  <line x1="26.5" y1="9.5" x2="26.5" y2="54.5" stroke="#e08a7d" stroke-width="2.2"/>
+
+  <!-- spiral kiri -->
+  <g fill="#c9b98f" stroke="#a89a70" stroke-width="0.8">
+    <rect x="7" y="15" width="9" height="3.4" rx="1.7"/>
+    <rect x="7" y="25" width="9" height="3.4" rx="1.7"/>
+    <rect x="7" y="35" width="9" height="3.4" rx="1.7"/>
+    <rect x="7" y="45" width="9" height="3.4" rx="1.7"/>
+  </g>
+
+  <!-- kanji -->
+  <text x="39" y="37" text-anchor="middle"
+        font-family="'Zen Maru Gothic','Yu Gothic','Meiryo',serif"
+        font-weight="900" font-size="24" fill="#234f75"
+        stroke="#234f75" stroke-width="0.6" paint-order="stroke">漢</text>
 </svg>

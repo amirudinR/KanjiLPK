@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import kanjiN5 from './data/kanji.js'
 import useProgress from './hooks/useProgress.js'
+import useTheme from './hooks/useTheme.js'
 import Flashcard from './components/Flashcard.jsx'
 import Quiz from './components/Quiz.jsx'
 import './App.css'
@@ -75,6 +76,21 @@ function Icon({ name }) {
       </svg>
     )
   }
+  if (name === 'sun') {
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="4.2" />
+        <path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6" />
+      </svg>
+    )
+  }
+  if (name === 'moon') {
+    return (
+      <svg {...common}>
+        <path d="M20 14.4A8.2 8.2 0 1 1 9.6 4a6.6 6.6 0 0 0 10.4 10.4Z" />
+      </svg>
+    )
+  }
   return null
 }
 
@@ -92,6 +108,8 @@ function App() {
   const [tab, setTab] = useState('belajar')
   const [index, setIndex] = useState(0)
   const total = kanjiN5.length
+
+  const { theme, toggleTheme } = useTheme()
 
   const {
     statusFor,
@@ -151,17 +169,35 @@ function App() {
             </div>
           </div>
 
-          <div
-            className="notebook-badge"
-            role="status"
-            aria-label={`Progres hafalan ${progressPercent} persen`}
-          >
-            <span className="notebook-badge-num" aria-hidden="true">
-              {progressPercent}%
-            </span>
-            <span className="notebook-badge-label" aria-hidden="true">
-              hafal
-            </span>
+          <div className="notebook-head-actions">
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={toggleTheme}
+              aria-label={
+                theme === 'dark'
+                  ? 'Ganti ke mode terang'
+                  : 'Ganti ke mode gelap'
+              }
+              title={theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
+            >
+              <span className="theme-toggle-icon" aria-hidden="true">
+                <Icon name={theme === 'dark' ? 'sun' : 'moon'} />
+              </span>
+            </button>
+
+            <div
+              className="notebook-badge"
+              role="status"
+              aria-label={`Progres hafalan ${progressPercent} persen`}
+            >
+              <span className="notebook-badge-num" aria-hidden="true">
+                {progressPercent}%
+              </span>
+              <span className="notebook-badge-label" aria-hidden="true">
+                hafal
+              </span>
+            </div>
           </div>
         </header>
 

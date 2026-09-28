@@ -155,6 +155,44 @@
   color: var(--ink-soft);
 }
 
+.notebook-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  color: var(--accent-deep);
+  background: var(--card);
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  box-shadow: 0 3px 0 rgba(47, 111, 159, 0.28);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-2px) rotate(-6deg);
+}
+
+.theme-toggle:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.theme-toggle-icon {
+  display: grid;
+  place-items: center;
+}
+
 /* --- Tab --- */
 .tabs {
   display: flex;
@@ -459,19 +497,33 @@
 
 /* Sidebar lompat cepat */
 .flashcard-sidebar {
+  display: flex;
+  flex-direction: column;
   background: var(--card);
   border: 2px dashed var(--paper-edge);
   border-radius: var(--radius);
-  padding: 12px;
+  padding: 12px 10px;
   box-shadow: var(--shadow-paper);
+  position: sticky;
+  top: 16px;
+  max-height: calc(100vh - 32px);
 }
 
 .flashcard-sidebar-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   font-family: var(--font-hand);
   font-size: 1.35rem;
   color: var(--ink-soft);
   text-align: center;
-  margin-bottom: 8px;
+  margin: 0 0 10px;
+}
+
+.flashcard-sidebar-icon {
+  color: var(--accent);
+  flex: none;
 }
 
 .flashcard-jump-list {
@@ -479,27 +531,37 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
-  gap: 6px;
-  max-height: 300px;
-  overflow: auto;
-  padding-right: 4px;
+  grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+  gap: 7px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 2px 4px 2px 2px;
+  scrollbar-gutter: stable;
+}
+
+.flashcard-jump-list > li {
+  display: flex;
+  min-width: 0;
 }
 
 .flashcard-jump {
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 1 / 1;
   display: grid;
   place-items: center;
   font-family: var(--font-note);
-  font-size: 0.92rem;
+  font-size: 0.95rem;
+  line-height: 1;
   background: var(--paper);
   border: 1.5px solid var(--paper-edge);
-  border-radius: 8px;
+  border-radius: 9px;
   color: var(--ink-soft);
   transition:
     transform 120ms ease,
-    background 120ms ease;
+    background 120ms ease,
+    border-color 120ms ease;
 }
 
 .flashcard-jump:hover {
@@ -509,14 +571,15 @@
 .flashcard-jump-known {
   background: var(--success-soft);
   border-color: var(--success);
-  color: #2f5f3b;
+  color: var(--success);
   font-weight: 700;
 }
 
 .flashcard-jump-learning {
   background: var(--highlight);
-  border-color: #d8bd3e;
-  color: #7a6412;
+  border-color: var(--highlight);
+  color: #4a3c05;
+  font-weight: 700;
 }
 
 .flashcard-jump-new {
@@ -1048,14 +1111,27 @@
 
   .flashcard-main {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
+  /* Panel lompat cepat di mobile: tidak lagi sticky & tidak terpotong. */
   .flashcard-sidebar {
     order: 2;
+    position: static;
+    max-height: none;
   }
 
   .flashcard-jump-list {
-    max-height: 190px;
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+    /* Tinggi menyesuaikan isi; scroll hanya bila daftar sangat panjang. */
+    max-height: min(48vh, 340px);
+    overflow-y: auto;
+  }
+
+  .notebook-head-actions {
+    width: 100%;
+    justify-content: space-between;
+    order: 3;
   }
 
   .flashcard-detail {
@@ -1086,15 +1162,115 @@
     padding: 16px 12px;
   }
 
+  .notebook-head {
+    gap: 12px;
+  }
+
+  .notebook-title {
+    gap: 10px;
+  }
+
+  .notebook-title-icon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .theme-toggle {
+    width: 46px;
+    height: 46px;
+  }
+
+  .notebook-head-actions {
+    gap: 10px;
+  }
+
+  /* Tombol lompat cepat: penuh, rapi, tidak terpotong. */
+  .flashcard-jump-list {
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    gap: 6px;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .flashcard-jump {
+    font-size: 0.9rem;
+    border-radius: 8px;
+  }
+
   .flashcard-controls {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
   }
 
   .flashcard-btn {
     width: 100%;
+    padding: 12px 10px;
+    font-size: 0.98rem;
+  }
+
+  /* Tombol "Balik Kartu" jadi unggulan, seluruh lebar. */
+  .flashcard-btn-flip {
+    grid-column: 1 / -1;
+    order: -1;
   }
 
   .notebook-title h1 {
     font-size: 1.75rem;
   }
+}
+
+/* ==========================================================================
+   Penyesuaian mode gelap
+   (warna status/tombol yang sebelumnya hardcoded disesuaikan agar
+   tetap kontras & terbaca di atas kertas tua)
+   ========================================================================== */
+:root[data-theme='dark'] .notebook-ring {
+  border-color: #6f6650;
+  background: linear-gradient(180deg, #45443c, #2c2b26);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 2px 3px -1px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-theme='dark'] .flashcard-front::after {
+  background: linear-gradient(225deg, var(--paper) 50%, #33363e 50%);
+}
+
+/* Teks di atas tombol aksen terang harus gelap */
+:root[data-theme='dark'] .flashcard-btn-flip,
+:root[data-theme='dark'] .quiz-next,
+:root[data-theme='dark'] .quiz-restart,
+:root[data-theme='dark'] .btn-ghost {
+  color: #14202b;
+  border-color: #4f8fbf;
+}
+
+/* Status "hafal" */
+:root[data-theme='dark'] .flashcard-btn-known.is-known,
+:root[data-theme='dark'] .flashcard-jump-known,
+:root[data-theme='dark'] .quiz-status-known,
+:root[data-theme='dark'] .quiz-option.correct {
+  color: var(--success);
+}
+
+/* Status "sedang belajar" */
+:root[data-theme='dark'] .flashcard-btn-learning,
+:root[data-theme='dark'] .quiz-status-learning {
+  color: var(--highlight);
+}
+
+/* Jawaban salah */
+:root[data-theme='dark'] .quiz-option.wrong {
+  color: var(--danger);
+}
+
+/* Kartu statistik */
+:root[data-theme='dark'] .stat-learning {
+  border-color: var(--highlight);
+}
+
+:root[data-theme='dark'] .stat-learning .stat-value {
+  color: var(--highlight);
 }
