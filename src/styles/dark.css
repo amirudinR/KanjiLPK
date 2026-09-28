@@ -63,3 +63,12 @@
   color: var(--ink);
   border-color: var(--accent);
 }
+
+/* Label on/kun di rincian kanji: teks gelap di atas aksen terang */
+:root[data-theme='dark'] .flashcard-kanji-tag {
+  color: #14202b;
+}
+
+:root[data-theme='dark'] .flashcard-kanji-line {
+  color: var(--accent-deep);
+}

@@ -3,7 +3,7 @@ import FlashcardFront from './flashcard/FlashcardFront.jsx'
 import FlashcardBack from './flashcard/FlashcardBack.jsx'
 import JumpList from './flashcard/JumpList.jsx'
 import FlashcardControls from './flashcard/FlashcardControls.jsx'
-import { kanjiChars, relatedWords } from '../utils/kanjiDetail.js'
+import { kanjiDetails, relatedWords } from '../utils/kanjiDetail.js'
 
 /**
  * Mode hafalan kartu BERURUTAN: satu kosakata per kartu, bisa dibalik
@@ -78,9 +78,9 @@ function Flashcard({
     [item, statusFor],
   )
 
-  // Data tambahan untuk sisi balik (diambil dari dataset sendiri).
-  const kanjiList = useMemo(
-    () => (item ? kanjiChars(item.kata) : []),
+  // Data tambahan untuk sisi balik (dari dataset + kamus kanji).
+  const kanjiInfoList = useMemo(
+    () => (item ? kanjiDetails(item.kata) : []),
     [item],
   )
   const related = useMemo(
@@ -148,7 +148,7 @@ function Flashcard({
 
             <FlashcardBack
               item={item}
-              kanjiList={kanjiList}
+              kanjiInfoList={kanjiInfoList}
               related={related}
               flipped={flipped}
               onSpeak={speakWord}

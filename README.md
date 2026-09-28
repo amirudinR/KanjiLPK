@@ -17,6 +17,16 @@ Aplikasi web untuk menghafal **kosakata/kanji JFT secara berurutan**, dengan des
 
 Berisi **613 entri kosakata** dari materi *KANJI JFT (1).docx*, sudah diurutkan sesuai nomor pada file sumber (1 - 613). Tiap entri: `{ id, kata, baca, arti }`.
 
+Ditambah **kamus kanji** (`src/data/kanjiDict.js`) berisi 490 kanji yang dipakai di dataset, lengkap dengan on'yomi, kun'yomi, arti, dan jumlah goresan. Sumber: **KANJIDIC2** (EDRDG, lisensi Creative Commons BY-SA 3.0).
+
+## Sisi Balik Kartu
+
+Saat kartu dibalik, ditampilkan selengkap mungkin:
+- **Bacaan** (furigana) dan **Arti** (dipecah per makna)
+- **Rincian per-kanji** — karakter, on'yomi (音), kun'yomi (訓), arti, dengan tombol audio per karakter
+- **Contoh kata terkait** — kata lain di dataset yang memakai kanji sama (otomatis dari data). Bila tidak ada, muncul keterangan.
+- **Nomor** entri
+
 ## Audio
 
 Pelafalan memakai **Web Speech API** bawaan browser (tanpa file audio tambahan). Suara bahasa Jepang (ja-JP) hanya muncul bila perangkat/browser menyediakannya. Bila tidak ada, tombol audio otomatis disembunyikan.
@@ -44,8 +54,9 @@ Buka `http://localhost:5173`.
 ```
 src/
   data/kosakata.js             # Data 613 kosakata JFT (urut sesuai docx)
+  data/kanjiDict.js            # Kamus 490 kanji (KANJIDIC2)
   hooks/                       # useProgress, useTheme, useSpeech, useFont
-  utils/                       # meanings.js, quiz.js (logika bersama)
+  utils/                       # meanings.js, quiz.js, kanjiDetail.js
   components/
     Icon.jsx                   # Ikon SVG seragam
     NotebookHeader.jsx         # Kepala buku + pemilih font/tema + badge

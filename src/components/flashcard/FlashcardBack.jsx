@@ -3,12 +3,12 @@ import { splitMeanings } from '../../utils/meanings.js'
 
 /**
  * Sisi belakang kartu hafalan yang lengkap:
- * judul kanji + audio, Bacaan, Arti, Rincian per-kanji, Contoh kata
- * terkait, dan info tabel catatan (nomor).
+ * judul kanji + audio, Bacaan, Arti, rincian per-kanji (on'yomi,
+ * kun'yomi, arti, goresan), contoh kata terkait, dan nomor catatan.
  *
  * @param {object} props
  * @param {object} props.item - kosakata yang sedang ditampilkan
- * @param {string[]} props.kanjiList - daftar karakter kanji dalam kata
+ * @param {Array} props.kanjiInfoList - detail tiap kanji (dari kamus)
  * @param {Array} props.related - contoh kata terkait (dari dataset)
  * @param {boolean} props.flipped - apakah kartu menampilkan sisi belakang
  * @param {(text:string) => void} props.onSpeak - bacakan teks
@@ -17,7 +17,7 @@ import { splitMeanings } from '../../utils/meanings.js'
  */
 function FlashcardBack({
   item,
-  kanjiList = [],
+  kanjiInfoList = [],
   related = [],
   flipped,
   onSpeak,
@@ -62,23 +62,42 @@ function FlashcardBack({
           </dd>
         </div>
 
-        {kanjiList.length > 0 ? (
+        {kanjiInfoList.length > 0 ? (
           <div className="flashcard-detail">
             <dt>Kanji</dt>
             <dd>
               <ul className="flashcard-kanji-list">
-                {kanjiList.map((ch, i) => (
-                  <li key={`${ch}-${i}`} className="flashcard-kanji-chip">
-                    <span className="flashcard-kanji-chip-char" lang="ja">
-                      {ch}
-                    </span>
-                    <SpeakerButton
-                      onClick={() => onSpeak?.(ch)}
-                      supported={speechSupported}
-                      japanese={hasJapaneseVoice}
-                      label={`Dengarkan kanji ${ch}`}
-                      className="speak-btn-inline"
-                    />
+                {kanjiInfoList.map((k, i) => (
+                  <li key={`${k.char}-${i}`} className="flashcard-kanji-card">
+                    <div className="flashcard-kanji-card-head">
+                      <span className="flashcard-kanji-chip-char" lang="ja">
+                        {k.char}
+                      </span>
+                      <SpeakerButton
+                        onClick={() => onSpeak?.(k.char)}
+                        supported={speechSupported}
+                        japanese={hasJapaneseVoice}
+                        label={`Dengarkan kanji ${k.char}`}
+                        className="speak-btn-inline"
+                      />
+                    </div>
+                    <div className="flashcard-kanji-card-body">
+                      {k.on.length > 0 ? (
+                        <p className="flashcard-kanji-line">
+                          <span className="flashcard-kanji-tag">音</span>
+                          <span lang="ja">{k.on.join('、')}</span>
+                        </p>
+                      ) : null}
+                      {k.kun.length > 0 ? (
+                        <p className="flashcard-kanji-line">
+                          <span className="flashcard-kanji-tag">訓</span>
+                          <span lang="ja">{k.kun.join('、')}</span>
+                        </p>
+                      ) : null}
+                      {k.arti ? (
+                        <p className="flashcard-kanji-arti">{k.arti}</p>
+                      ) : null}
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -86,10 +105,10 @@ function FlashcardBack({
           </div>
         ) : null}
 
-        {related.length > 0 ? (
-          <div className="flashcard-detail">
-            <dt>Contoh</dt>
-            <dd>
+        <div className="flashcard-detail">
+          <dt>Contoh</dt>
+          <dd>
+            {related.length > 0 ? (
               <ul className="flashcard-related">
                 {related.map((r) => (
                   <li key={r.id} className="flashcard-related-item">
@@ -103,9 +122,13 @@ function FlashcardBack({
                   </li>
                 ))}
               </ul>
-            </dd>
-          </div>
-        ) : null}
+            ) : (
+              <p className="flashcard-related-empty">
+                Belum ada kata lain dengan kanji yang sama di daftar ini.
+              </p>
+            )}
+          </dd>
+        </div>
       </dl>
 
       <div className="flashcard-note">

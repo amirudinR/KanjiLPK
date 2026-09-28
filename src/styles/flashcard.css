@@ -49,7 +49,7 @@
 /* Kartu yang bisa dibalik */
 .flashcard-flip {
   position: relative;
-  min-height: 340px;
+  min-height: 440px;
   perspective: 1600px;
   cursor: pointer;
 }
@@ -57,7 +57,7 @@
 .flashcard-inner {
   position: relative;
   width: 100%;
-  min-height: 340px;
+  min-height: 440px;
   transition: transform 560ms cubic-bezier(0.34, 1.16, 0.64, 1);
   transform-style: preserve-3d;
 }
@@ -209,39 +209,85 @@
   color: var(--ink);
 }
 
-/* Rincian per-kanji */
+/* Rincian per-kanji (kaya: on'yomi, kun'yomi, arti) */
 .flashcard-kanji-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
 }
 
-.flashcard-kanji-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 6px 3px 4px;
+.flashcard-kanji-card {
+  display: flex;
+  gap: 10px;
+  padding: 8px 10px;
   background: var(--card);
   border: 1.5px dashed var(--paper-edge);
-  border-radius: 10px;
+  border-radius: 12px;
+}
+
+.flashcard-kanji-card-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.flashcard-kanji-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: 0.92rem;
+}
+
+.flashcard-kanji-line {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--accent-deep);
+  font-weight: 700;
+  word-break: break-word;
+}
+
+.flashcard-kanji-tag {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  font-family: var(--font-jp);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--card);
+  background: var(--accent);
+  border-radius: 5px;
+}
+
+.flashcard-kanji-arti {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  font-style: italic;
 }
 
 .flashcard-kanji-chip-char {
   display: grid;
   place-items: center;
-  min-width: 40px;
-  height: 40px;
+  min-width: 44px;
+  height: 44px;
   padding: 0 8px;
   font-family: var(--font-jp);
   font-weight: 900;
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   line-height: 1;
   color: var(--accent-deep);
   background: var(--accent-soft);
-  border-radius: 8px;
+  border-radius: 9px;
 }
 
 .speak-btn-inline {
@@ -290,6 +336,13 @@
 .flashcard-related-arti {
   font-size: 0.96rem;
   color: var(--ink);
+}
+
+.flashcard-related-empty {
+  margin: 0;
+  font-size: 0.92rem;
+  font-style: italic;
+  color: var(--ink-faint);
 }
 
 /* Catatan nomor bergaya buku */
