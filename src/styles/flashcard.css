@@ -209,6 +209,114 @@
   color: var(--ink);
 }
 
+/* Rincian per-kanji */
+.flashcard-kanji-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.flashcard-kanji-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px 3px 4px;
+  background: var(--card);
+  border: 1.5px dashed var(--paper-edge);
+  border-radius: 10px;
+}
+
+.flashcard-kanji-chip-char {
+  display: grid;
+  place-items: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 8px;
+  font-family: var(--font-jp);
+  font-weight: 900;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--accent-deep);
+  background: var(--accent-soft);
+  border-radius: 8px;
+}
+
+.speak-btn-inline {
+  width: 32px;
+  height: 32px;
+}
+
+.speak-btn-inline .speak-btn-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Contoh kata terkait */
+.flashcard-related {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.flashcard-related-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  padding: 5px 10px;
+  background: var(--card);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+}
+
+.flashcard-related-word {
+  font-family: var(--font-jp);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--accent-deep);
+}
+
+.flashcard-related-read {
+  font-family: var(--font-jp);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.flashcard-related-arti {
+  font-size: 0.96rem;
+  color: var(--ink);
+}
+
+/* Catatan nomor bergaya buku */
+.flashcard-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  margin-top: 16px;
+  padding: 4px 14px;
+  font-family: var(--font-hand);
+  background: var(--highlight);
+  border-radius: 999px;
+  transform: rotate(-1deg);
+}
+
+.flashcard-note-label {
+  font-size: 1.15rem;
+  color: var(--ink-soft);
+}
+
+.flashcard-note-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
 /* --- Tombol pelafalan (audio) --- */
 .speak-btn {
   display: inline-grid;
