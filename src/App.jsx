@@ -1,7 +1,8 @@
 import { useCallback, useMemo, useState } from 'react'
-import kanjiN5 from './data/kanji.js'
+import kosakataJft from './data/kosakata.js'
 import useProgress from './hooks/useProgress.js'
 import useTheme from './hooks/useTheme.js'
+import useSpeech from './hooks/useSpeech.js'
 import Flashcard from './components/Flashcard.jsx'
 import Quiz from './components/Quiz.jsx'
 import './App.css'
@@ -107,9 +108,10 @@ function Stat({ value, label, tone, sub }) {
 function App() {
   const [tab, setTab] = useState('belajar')
   const [index, setIndex] = useState(0)
-  const total = kanjiN5.length
+  const total = kosakataJft.length
 
   const { theme, toggleTheme } = useTheme()
+  const { speak, supported: speechSupported, hasJapaneseVoice } = useSpeech()
 
   const {
     statusFor,
@@ -141,9 +143,9 @@ function App() {
   )
 
   const statusNote = useMemo(() => {
-    if (counts.known === 0) return 'Mulai tandai kanji yang sudah kamu hafal.'
-    if (counts.known === total) return 'Semua kanji sudah ditandai hafal!'
-    return `Sisa ${total - counts.known} kanji lagi menuju tamat.`
+    if (counts.known === 0) return 'Mulai tandai kosakata yang sudah kamu hafal.'
+    if (counts.known === total) return 'Semua kosakata sudah ditandai hafal!'
+    return `Sisa ${total - counts.known} kosakata lagi menuju tamat.`
   }, [counts.known, total])
 
   return (
@@ -163,8 +165,8 @@ function App() {
             <div>
               <h1>Buku Hafalan Kanji</h1>
               <p className="notebook-subtitle">
-                Kanji <span className="subtitle-level">N5</span> · {total} karakter
-                berurutan
+                Kosakata <span className="subtitle-level">JFT</span> · {total}{' '}
+                entri berurutan
               </p>
             </div>
           </div>
@@ -238,7 +240,7 @@ function App() {
         <main className="notebook-body">
           {tab === 'belajar' && (
             <Flashcard
-              items={kanjiN5}
+              items={kosakataJft}
               index={index}
               onPrev={handlePrev}
               onNext={handleNext}
@@ -246,15 +248,21 @@ function App() {
               statusFor={statusFor}
               onToggleKnown={toggleKnown}
               onMarkLearning={markLearning}
+              onSpeak={speak}
+              speechSupported={speechSupported}
+              hasJapaneseVoice={hasJapaneseVoice}
             />
           )}
 
           {tab === 'kuis' && (
             <Quiz
-              items={kanjiN5}
+              items={kosakataJft}
               statusFor={statusFor}
               onCorrect={markKnown}
               onWrong={markLearning}
+              onSpeak={speak}
+              speechSupported={speechSupported}
+              hasJapaneseVoice={hasJapaneseVoice}
             />
           )}
 
@@ -263,22 +271,22 @@ function App() {
               <h2 className="dashboard-title">Ringkasan Progres</h2>
               <p className="dashboard-intro">
                 Pantau seberapa jauh hafalanmu. Buka tab{' '}
-                <strong>Hafalan</strong> untuk menandai kanji satu per satu.
+                <strong>Hafalan</strong> untuk menandai kosakata satu per satu.
               </p>
 
               <div className="stat-grid">
-                <Stat value={counts.known} label="Sudah hafal" tone="known" sub="kanji" />
+                <Stat value={counts.known} label="Sudah hafal" tone="known" sub="entri" />
                 <Stat
                   value={counts.learning}
                   label="Sedang belajar"
                   tone="learning"
-                  sub="kanji"
+                  sub="entri"
                 />
                 <Stat
                   value={total - counts.known}
                   label="Belum hafal"
                   tone="todo"
-                  sub="kanji"
+                  sub="entri"
                 />
               </div>
 

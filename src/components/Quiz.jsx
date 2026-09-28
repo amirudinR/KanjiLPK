@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
+import SpeakerButton from './SpeakerButton.jsx'
 
 const SESSION_SIZE = 10
 const OPTION_COUNT = 4
@@ -69,7 +70,15 @@ function CrossIcon() {
   )
 }
 
-function Quiz({ items = [], statusFor, onCorrect, onWrong }) {
+function Quiz({
+  items = [],
+  statusFor,
+  onCorrect,
+  onWrong,
+  onSpeak,
+  speechSupported = false,
+  hasJapaneseVoice = false,
+}) {
   const [session, setSession] = useState(() => buildSession(items, SESSION_SIZE))
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState(null)
@@ -183,8 +192,17 @@ function Quiz({ items = [], statusFor, onCorrect, onWrong }) {
       <div className="quiz-card">
         <div className="quiz-kanji-wrap">
           <span className="quiz-kanji" lang="ja">
-            {current.kanji}
+            {current.kata}
           </span>
+          {speechSupported && hasJapaneseVoice ? (
+            <SpeakerButton
+              onClick={() => onSpeak?.(current.kata)}
+              supported={speechSupported}
+              japanese={hasJapaneseVoice}
+              label={`Dengarkan pelafalan ${current.kata}`}
+              className="speak-btn-lg"
+            />
+          ) : null}
           {status && status !== 'new' ? (
             <span className={`quiz-status quiz-status-${status}`}>
               {status === 'known' ? 'Sudah hafal' : 'Sedang belajar'}
@@ -192,7 +210,7 @@ function Quiz({ items = [], statusFor, onCorrect, onWrong }) {
           ) : null}
         </div>
 
-        <h2 className="quiz-question">Apa arti kanji di atas?</h2>
+        <h2 className="quiz-question">Apa arti kosakata di atas?</h2>
 
         <ul className="quiz-options">
           {options.map((option) => {

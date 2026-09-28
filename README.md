@@ -1,21 +1,25 @@
-# Kanji Notebook — Hafalan Kanji N5
+# Kanji Notebook — Hafalan Kanji JFT
 
-Aplikasi web untuk menghafal **kanji JLPT N5 secara berurutan**, dengan desain bergaya **buku catatan kertas**. Dibuat dengan React + Vite.
+Aplikasi web untuk menghafal **kosakata/kanji JFT secara berurutan**, dengan desain bergaya **buku catatan kertas**. Dibuat dengan React + Vite.
 
 ## Fitur
 
-- **Hafalan (Flashcard) berurutan** — tampilkan kanji satu per satu sesuai urutan, kartu bisa dibalik untuk melihat arti.
-- **On'yomi, Kun'yomi & Arti** — lengkap dengan contoh kosakata tiap kanji.
+- **Hafalan (Flashcard) berurutan** — tampilkan kosakata satu per satu sesuai urutan; kartu bisa dibalik untuk melihat cara baca & arti.
+- **Audio pelafalan** — tombol speaker membacakan kata/bacaan dengan pelafalan bahasa Jepang (Web Speech API).
 - **Kuis pilihan ganda** — 10 soal acak per sesi, dengan skor dan ringkasan akhir.
-- **Simpan progres otomatis** — tandai kanji "sudah hafal" / "sedang belajar"; tersimpan di `localStorage` browser.
-- **Dashboard progres** — ringkasan jumlah kanji hafal, sedang belajar, dan belum hafal.
+- **Simpan progres otomatis** — tandai kosakata "sudah hafal" / "sedang belajar"; tersimpan di `localStorage` browser.
+- **Dashboard progres** — ringkasan jumlah hafal, sedang belajar, dan belum hafal.
 - **Mode gelap** — tombol terang/gelap di header, ikut preferensi sistem, pilihan tersimpan otomatis.
-- **Lompat cepat** — grid nomor kanji untuk pindah langsung; responsif di layar ponsel.
+- **Lompat cepat** — grid nomor untuk pindah langsung; responsif di layar ponsel.
 - **Desain kertas** — latar buku bergaris, spiral, font tulisan tangan, kartu flip 3D.
 
 ## Data
 
-Berisi **145 kanji level N5** lengkap dengan on'yomi (katakana), kun'yomi (hiragana), arti, dan contoh kosakata.
+Berisi **613 entri kosakata** dari materi *KANJI JFT (1).docx*, sudah diurutkan sesuai nomor pada file sumber (1 - 613). Tiap entri: `{ id, kata, baca, arti }`.
+
+## Audio
+
+Pelafalan memakai **Web Speech API** bawaan browser (tanpa file audio tambahan). Suara bahasa Jepang (ja-JP) hanya muncul bila perangkat/browser menyediakannya. Bila tidak ada, tombol audio otomatis disembunyikan.
 
 ## Menjalankan
 
@@ -39,10 +43,13 @@ Buka `http://localhost:5173`.
 
 ```
 src/
-  data/kanji.js             # Data 145 kanji N5
-  hooks/useProgress.js      # Simpan progres ke localStorage
-  components/Flashcard.jsx  # Mode hafalan kartu berurutan
-  components/Quiz.jsx       # Mode kuis pilihan ganda
-  App.jsx                   # Kerangka buku + navigasi tab
-  index.css / App.css       # Tema "kertas"
+  data/kosakata.js             # Data 613 kosakata JFT (urut sesuai docx)
+  hooks/useProgress.js         # Simpan progres ke localStorage
+  hooks/useTheme.js            # Mode terang/gelap
+  hooks/useSpeech.js           # Pelafalan Jepang (Web Speech API)
+  components/Flashcard.jsx     # Mode hafalan kartu berurutan
+  components/Quiz.jsx          # Mode kuis pilihan ganda
+  components/SpeakerButton.jsx # Tombol pelafalan (audio)
+  App.jsx                      # Kerangka buku + navigasi tab
+  index.css / App.css          # Tema "kertas"
 ```

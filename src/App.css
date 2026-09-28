@@ -379,6 +379,80 @@
   border-bottom-left-radius: 4px;
 }
 
+/* --- Tombol pelafalan (audio) --- */
+.speak-btn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  color: var(--accent-deep);
+  background: var(--card);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 2px 0 rgba(47, 111, 159, 0.3);
+  transition:
+    transform 130ms ease,
+    box-shadow 130ms ease,
+    background 130ms ease,
+    color 130ms ease;
+}
+
+.speak-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 0 rgba(47, 111, 159, 0.4);
+}
+
+.speak-btn:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: none;
+}
+
+.speak-btn:disabled {
+  opacity: 0.5;
+}
+
+.speak-btn-icon {
+  display: block;
+}
+
+/* Tombol audio besar di sisi depan kartu */
+.speak-btn-lg {
+  width: 52px;
+  height: 52px;
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent-deep);
+}
+
+.speak-btn-lg:hover {
+  box-shadow: 0 4px 0 var(--accent-deep);
+}
+
+.flashcard-audio {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tombol audio kecil di samping bacaan */
+.speak-btn-inline {
+  width: 34px;
+  height: 34px;
+  vertical-align: middle;
+  margin-left: 10px;
+}
+
+.speak-btn-inline .speak-btn-icon {
+  width: 17px;
+  height: 17px;
+}
+
+.flashcard-detail-baca {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .flashcard-front {
   background-image:
     linear-gradient(var(--line-blue) 1px, transparent 1px),
@@ -1273,4 +1347,10 @@
 
 :root[data-theme='dark'] .stat-learning .stat-value {
   color: var(--highlight);
+}
+
+/* Tombol audio di atas aksen terang perlu teks gelap */
+:root[data-theme='dark'] .speak-btn-lg {
+  color: #14202b;
+  border-color: #4f8fbf;
 }
