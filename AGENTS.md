@@ -24,6 +24,16 @@ Panduan untuk AI agent (atau developer) yang mengerjakan proyek ini.
 - Repo `KanjiLPK` pernah keliru ditimpa kode proyek lain (force push). Sudah
   dipulihkan ke versi Kanji asli.
 
+## Fitur
+
+- **Flashcard** — Kartu flip 3D dengan keyboard shortcuts (Space/Enter=flip, ←→=navigasi, K=hafal, L=belajar). Rincian kanji dan contoh kata bisa dibuka-tutup (collapsible).
+- **Quiz** — Kuis pilihan ganda dengan keyboard shortcuts (1-4=jawab, Enter=lanjut).
+- **Semua Kosakata** — Grid/list toggle, search, filter status (Semua/Hafal/Belajar/Baru), kartu expandable dengan detail lengkap.
+- **Progres** — Dashboard dengan streak harian, export/import progress, reset dengan konfirmasi 2-klik.
+- **Font** — 13 pilihan font (notebook, clean, rounded, hand, mincho, gothic, kyokasho, kaisho, gyosho, sosho, tegaki, pop, yumincho, meiryo).
+- **Dark Mode** — Toggle terang/gelap dengan transisi halus.
+- **Responsive** — Layout adaptif untuk desktop dan mobile.
+
 ## Menjalankan
 
 ```bash
@@ -50,7 +60,26 @@ src/
   data/kanjiDict.js    # kamus 490 kanji (KANJIDIC2)
   hooks/               # useProgress, useTheme, useSpeech, useFont
   utils/               # meanings.js, quiz.js, kanjiDetail.js
-  components/          # Icon, NotebookHeader, TabNav, Dashboard, Flashcard, Quiz, dll.
-  styles/              # CSS modular: layout, flashcard, quiz, dashboard, responsive, dark
-  App.jsx
+  components/
+    Icon.jsx           # Ikon SVG
+    NotebookHeader.jsx # Header + font picker + theme toggle + badge progres
+    TabNav.jsx         # Navigasi tab
+    ProgressStrip.jsx  # Strip progres
+    Dashboard.jsx      # Dashboard progres + streak + export/import
+    Flashcard.jsx      # Mode hafalan kartu berurutan
+    Quiz.jsx           # Mode kuis pilihan ganda
+    AllWords.jsx       # Halaman Semua Kosakata (grid/list, search, filter, expandable)
+    SpeakerButton.jsx  # Tombol pelafalan audio
+    flashcard/         # Sub-komponen: Front, Back, Controls, JumpList
+    quiz/              # Sub-komponen: Options, Feedback, Result, Icons
+  styles/
+    index.css          # Tema dasar + 13 font options
+    layout.css         # Kerangka buku catatan
+    flashcard.css      # Mode hafalan
+    quiz.css           # Mode kuis
+    dashboard.css      # Dashboard progres
+    allwords.css       # Halaman Semua Kosakata
+    responsive.css     # Responsif mobile/desktop
+    dark.css           # Penyesuaian mode gelap
+  App.jsx              # Rangkaian utama (routing)
 ```
