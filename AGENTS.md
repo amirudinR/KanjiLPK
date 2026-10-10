@@ -53,6 +53,25 @@ Project Vercel `kanjilpk` **tidak** auto-deploy dari push ke repo `KanjiLPK`.
 Setiap ada perubahan, jalankan deploy manual `npx vercel --prod` dari folder ini.
 (Alternatif: hubungkan ulang repo di Dashboard Vercel → Settings → Git.)
 
+### PENTING — service worker lama "Kotoba" menyodorkan versi basi
+
+Sebelum proyek Kanji, domain ini pernah dipakai aplikasi **Kotoba** yang merupakan
+**PWA** (`vite-plugin-pwa`). PWA meninggalkan **service worker** di browser
+pengunjung. Akibatnya browser tetap menyajikan bundle Kotoba lama walau server
+sudah mengirim versi Kanji. Gejala: buka `kanjilpk.vercel.app` di browser normal
+tampil Kotoba, tapi di Incognito tampil "Kanji Notebook" dengan benar.
+
+Solusi yang sudah dipasang: skrip pembersih di `index.html` yang
+**meng-unregister semua service worker** dan **menghapus Cache Storage lama**
+(selain cache milik `kanji-notebook`). App Kanji sendiri **bukan** PWA — tidak
+ada `vite-plugin-pwa` maupun registrasi SW, jadi pembersihan ini aman.
+
+Pembersihan manual (satu kali per browser yang terpengaruh):
+1. Buka DevTools (F12) → tab **Application**.
+2. **Service Workers** → klik **Unregister** untuk semua.
+3. **Storage** → **Clear site data**.
+4. Muat ulang dengan **Ctrl+Shift+R**.
+
 ## Fitur
 
 - **Flashcard** — Kartu flip 3D dengan keyboard shortcuts (Space/Enter=flip, ←→=navigasi, K=hafal, L=belajar). Rincian kanji dan contoh kata bisa dibuka-tutup (collapsible).

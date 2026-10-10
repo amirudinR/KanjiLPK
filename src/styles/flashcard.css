@@ -691,69 +691,95 @@
    ========================================================================== */
 @media (min-width: 761px) and (min-height: 620px) {
   .flashcard {
-    gap: 12px;
+    gap: 9px;
   }
 
   .flashcard-counter {
-    margin-bottom: 6px;
+    margin-bottom: 2px;
+  }
+
+  .flashcard-counter strong {
+    font-size: 1.3rem;
   }
 
   /* Tinggi kartu mengikuti viewport, dengan batas atas supaya tidak
      berlebihan di layar besar. */
   .flashcard-flip,
   .flashcard-inner {
-    min-height: clamp(300px, 42vh, 440px);
+    min-height: clamp(230px, 32vh, 360px);
+  }
+
+  .flashcard-face {
+    padding: 16px;
   }
 
   .flashcard-kanji {
-    font-size: clamp(4rem, 14vh, 8rem);
+    font-size: clamp(2.8rem, 10vh, 5.5rem);
   }
 
   .flashcard-hint {
-    margin-top: 12px;
-    font-size: 1.25rem;
+    margin-top: 8px;
+    font-size: 1.1rem;
   }
 
   .flashcard-audio {
-    margin-top: 12px;
+    margin-top: 8px;
   }
 
   .flashcard-back-head {
-    margin: 2px 0 12px;
-    padding-bottom: 10px;
+    margin: 2px 0 8px;
+    padding-bottom: 8px;
   }
 
   .flashcard-details {
-    gap: 6px;
+    gap: 4px;
   }
 
   .flashcard-sidebar {
-    margin-top: 12px;
-    padding: 10px 12px;
+    margin-top: 8px;
+    padding: 8px 12px;
   }
 
   .flashcard-sidebar-title {
-    font-size: 1.05rem;
-    margin-bottom: 8px;
+    font-size: 1rem;
+    margin-bottom: 6px;
   }
 
   .flashcard-jump-list {
-    grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
-    gap: 5px;
-    max-height: 96px;
+    grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+    gap: 4px;
+    max-height: 72px;
   }
 
   .flashcard-jump {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 
   .flashcard-controls {
     padding-top: 0;
+    margin-top: 0;
   }
 
   .flashcard-btn {
-    padding: 9px 16px;
-    font-size: 0.96rem;
+    padding: 8px 14px;
+    font-size: 0.94rem;
+  }
+}
+
+/* Layar desktop pendek (mis. tinggi ~700px) — mampatkan lebih agresif
+   agar tetap muat tanpa scroll. */
+@media (min-width: 761px) and (min-height: 620px) and (max-height: 780px) {
+  .flashcard-flip,
+  .flashcard-inner {
+    min-height: clamp(200px, 28vh, 280px);
+  }
+
+  .flashcard-kanji {
+    font-size: clamp(2.4rem, 9vh, 4.25rem);
+  }
+
+  .flashcard-jump-list {
+    max-height: 60px;
   }
 }
 

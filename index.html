@@ -20,6 +20,26 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Bersihkan sisa service worker / cache dari aplikasi lama (Kotoba PWA)
+      // yang pernah menempati domain ini, supaya tidak menyodorkan versi basi.
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          regs.forEach(function (reg) {
+            reg.unregister();
+          });
+        });
+      }
+      if (window.caches && caches.keys) {
+        caches.keys().then(function (keys) {
+          keys.forEach(function (key) {
+            if (key.indexOf('kanji-notebook') === -1) {
+              caches.delete(key);
+            }
+          });
+        });
+      }
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

@@ -378,3 +378,62 @@
 .foot-note {
   font-style: italic;
 }
+
+/* ==========================================================================
+   Desktop — mampatkan kerangka buku agar konten muat satu layar tanpa scroll.
+   Hanya berlaku di layar lebar (>=761px), jadi tampilan ponsel tak terpengaruh.
+   ========================================================================== */
+@media (min-width: 761px) and (min-height: 620px) {
+  .app {
+    padding: 14px clamp(12px, 2.4vw, 26px);
+  }
+
+  .notebook {
+    padding: 18px clamp(18px, 3vw, 40px) 14px;
+  }
+
+  .notebook-head {
+    padding-bottom: 10px;
+  }
+
+  .notebook-title-icon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .notebook-title h1 {
+    font-size: clamp(1.7rem, 3.4vw, 2.4rem);
+  }
+
+  .notebook-badge {
+    min-width: 78px;
+    padding: 8px 14px;
+  }
+
+  .notebook-badge-num {
+    font-size: 2rem;
+  }
+
+  .tabs {
+    margin-top: 12px;
+  }
+
+  .tab {
+    padding: 8px 16px;
+    font-size: 0.98rem;
+  }
+
+  .progress-strip {
+    padding: 8px 4px 12px;
+  }
+
+  .notebook-body {
+    padding: 4px 0 6px;
+  }
+
+  .notebook-foot {
+    margin-top: 12px;
+    padding-top: 10px;
+    font-size: 0.9rem;
+  }
+}
