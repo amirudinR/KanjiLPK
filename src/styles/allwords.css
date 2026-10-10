@@ -220,6 +220,141 @@
   color: var(--ink-faint);
 }
 
+.allwords-card-toggle {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.allwords-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.allwords-card-wrapper.is-expanded {
+  grid-column: 1 / -1;
+}
+
+.allwords-card-wrapper.is-expanded .allwords-card {
+  border-radius: 14px 14px 0 0;
+  border-bottom: none;
+}
+
+.allwords-card-detail {
+  padding: 14px;
+  background: var(--card);
+  border: 2px solid var(--accent);
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: expandDown 200ms ease-out;
+}
+
+@keyframes expandDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.allwords-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.allwords-detail-label {
+  font-size: 0.78rem;
+  font-family: var(--font-note);
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.allwords-detail-value {
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.allwords-detail-kanji-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.allwords-detail-kanji-chip {
+  display: grid;
+  place-items: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 8px;
+  background: var(--accent-soft);
+  border-radius: 8px;
+  font-family: var(--font-jp);
+  font-weight: 900;
+  font-size: 1.2rem;
+  color: var(--accent-deep);
+}
+
+.allwords-detail-related {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.allwords-detail-related li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.92rem;
+}
+
+.allwords-detail-related li span[lang='ja'] {
+  font-family: var(--font-jp);
+  font-weight: 700;
+  color: var(--accent-deep);
+}
+
+.allwords-detail-related-arti {
+  color: var(--ink-soft);
+}
+
+.allwords-detail-jump {
+  margin-top: 4px;
+  padding: 8px 16px;
+  font-size: 0.92rem;
+  font-family: var(--font-note);
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 130ms ease;
+}
+
+.allwords-detail-jump:hover {
+  background: var(--accent-deep);
+}
+
 .allwords-card-kata {
   font-family: var(--font-jp);
   font-weight: 900;

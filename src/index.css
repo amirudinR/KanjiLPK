@@ -77,10 +77,6 @@
     0 6px 14px -8px rgba(0, 0, 0, 0.6);
 }
 
-/* ==========================================================================
-   Pilihan gaya font — diubah lewat <html data-font="...">
-   Setiap opsi menata ulang font judul (hand), isi (note), dan kanji (jp).
-   ========================================================================== */
 :root[data-font='clean'] {
   --font-hand: 'Nunito', 'Segoe UI', sans-serif;
   --font-note: 'Nunito', 'Segoe UI', sans-serif;
@@ -97,6 +93,66 @@
   --font-hand: 'Gloria Hallelujah', 'Caveat', cursive;
   --font-note: 'Gloria Hallelujah', 'Patrick Hand', cursive;
   --font-jp: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', sans-serif;
+}
+
+:root[data-font='mincho'] {
+  --font-hand: 'Shippori Mincho', 'Hiragino Mincho ProN', serif;
+  --font-note: 'Shippori Mincho', 'Hiragino Mincho ProN', serif;
+  --font-jp: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+}
+
+:root[data-font='gothic'] {
+  --font-hand: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+  --font-note: 'Noto Sans JP', sans-serif;
+  --font-jp: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+}
+
+:root[data-font='kyokasho'] {
+  --font-hand: 'Zen Kaku Gothic New', sans-serif;
+  --font-note: 'Zen Kaku Gothic New', sans-serif;
+  --font-jp: 'Hiragino Kaku Gothic ProN', sans-serif;
+}
+
+:root[data-font='kaisho'] {
+  --font-hand: 'Yuji Syuku', 'Hiragino Kaku Gothic ProN', serif;
+  --font-note: 'Yuji Syuku', serif;
+  --font-jp: 'Hiragino Kaku Gothic ProN', serif;
+}
+
+:root[data-font='gyosho'] {
+  --font-hand: 'Yuji Syuku', 'Zen Kaku Gothic New', serif;
+  --font-note: 'Yuji Syuku', 'Zen Kaku Gothic New', serif;
+  --font-jp: 'Zen Kaku Gothic New', sans-serif;
+}
+
+:root[data-font='sosho'] {
+  --font-hand: 'Yuji Syuku', cursive;
+  --font-note: 'Yuji Syuku', cursive;
+  --font-jp: 'Hiragino Kaku Gothic ProN', cursive;
+}
+
+:root[data-font='tegaki'] {
+  --font-hand: 'Zen Maru Gothic', 'Comic Sans MS', cursive;
+  --font-note: 'Zen Maru Gothic', 'Comic Sans MS', cursive;
+  --font-jp: 'Zen Maru Gothic', sans-serif;
+}
+
+:root[data-font='pop'] {
+  --font-hand: 'M PLUS Rounded 1c', 'Arial Rounded MT Bold', sans-serif;
+  --font-note: 'M PLUS Rounded 1c', sans-serif;
+  --font-jp: 'M PLUS Rounded 1c', sans-serif;
+}
+
+:root[data-font='yumincho'] {
+  --font-hand: 'Yu Mincho', 'Hiragino Mincho ProN', serif;
+  --font-note: 'Yu Mincho', 'Hiragino Mincho ProN', serif;
+  --font-jp: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+}
+
+:root[data-font='meiryo'] {
+  --font-hand: 'Meiryo', 'Hiragino Kaku Gothic ProN', sans-serif;
+  --font-note: 'Meiryo', sans-serif;
+  --font-jp: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
 }
 
 *,

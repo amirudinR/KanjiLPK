@@ -1,18 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import Icon from './Icon.jsx'
+import { kanjiDetails, relatedWords } from '../utils/kanjiDetail.js'
 
-/**
- * Halaman "Semua Kosakata" — tampilan list & grid dengan search dan filter.
- *
- * @param {object} props
- * @param {Array<{id:number|string, kata:string, baca:string, arti:string}>} props.items
- * @param {(id: number|string) => 'known'|'learning'|'new'} props.statusFor
- * @param {(index: number) => void} props.onJumpToCard - lompat ke mode hafalan
- */
 function AllWords({ items, statusFor, onJumpToCard }) {
   const [view, setView] = useState('grid')
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
+  const [expandedId, setExpandedId] = useState(null)
 
   const filteredItems = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -34,6 +28,24 @@ function AllWords({ items, statusFor, onJumpToCard }) {
       })
   }, [items, search, filter, statusFor])
 
+  const expandedItem = useMemo(() => {
+    if (expandedId === null) return null
+    return items.find((it) => it.id === expandedId) ?? null
+  }, [expandedId, items])
+
+  const expandedKanjiInfo = useMemo(
+    () => (expandedItem ? kanjiDetails(expandedItem.kata) : []),
+    [expandedItem],
+  )
+  const expandedRelated = useMemo(
+    () => (expandedItem ? relatedWords(expandedItem, items, 5) : []),
+    [expandedItem, items],
+  )
+
+  const handleCardClick = (item) => {
+    setExpandedId((prev) => (prev === item.id ? null : item.id))
+  }
+
   const handleJumpToCard = (index) => {
     onJumpToCard(index)
   }
@@ -47,6 +59,7 @@ function AllWords({ items, statusFor, onJumpToCard }) {
         e.preventDefault()
         document.querySelector('.allwords-search-input')?.focus()
       }
+      if (e.key === 'Escape') setExpandedId(null)
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
@@ -146,18 +159,71 @@ function AllWords({ items, statusFor, onJumpToCard }) {
         <div className="allwords-grid">
           {filteredItems.map((item) => {
             const status = statusFor(item.id)
+            const isExpanded = expandedId === item.id
             return (
-              <button
+              <div
                 key={item.id}
-                type="button"
-                className={`allwords-card allwords-card-${status}`}
-                onClick={() => handleJumpToCard(item._index)}
+                className={`allwords-card-wrapper ${isExpanded ? 'is-expanded' : ''}`}
               >
-                <span className="allwords-card-no">{item.id}</span>
-                <span className="allwords-card-kata" lang="ja">{item.kata}</span>
-                <span className="allwords-card-baca" lang="ja">{item.baca}</span>
-                <span className="allwords-card-arti">{item.arti}</span>
-              </button>
+                <button
+                  type="button"
+                  className={`allwords-card allwords-card-${status}`}
+                  onClick={() => handleCardClick(item)}
+                  aria-expanded={isExpanded}
+                >
+                  <span className="allwords-card-no">{item.id}</span>
+                  <span className="allwords-card-kata" lang="ja">{item.kata}</span>
+                  <span className="allwords-card-baca" lang="ja">{item.baca}</span>
+                  <span className="allwords-card-arti">{item.arti}</span>
+                  <span className="allwords-card-toggle" aria-hidden="true">
+                    {isExpanded ? '−' : '+'}
+                  </span>
+                </button>
+                {isExpanded && (
+                  <div className="allwords-card-detail">
+                    <div className="allwords-detail-section">
+                      <span className="allwords-detail-label">Bacaan</span>
+                      <span className="allwords-detail-value" lang="ja">{item.baca}</span>
+                    </div>
+                    <div className="allwords-detail-section">
+                      <span className="allwords-detail-label">Arti</span>
+                      <span className="allwords-detail-value">{item.arti}</span>
+                    </div>
+                    {expandedKanjiInfo.length > 0 && (
+                      <div className="allwords-detail-section">
+                        <span className="allwords-detail-label">Kanji</span>
+                        <div className="allwords-detail-kanji-list">
+                          {expandedKanjiInfo.map((k, i) => (
+                            <span key={`${k.char}-${i}`} className="allwords-detail-kanji-chip" lang="ja">
+                              {k.char}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {expandedRelated.length > 0 && (
+                      <div className="allwords-detail-section">
+                        <span className="allwords-detail-label">Contoh</span>
+                        <ul className="allwords-detail-related">
+                          {expandedRelated.map((r) => (
+                            <li key={r.id}>
+                              <span lang="ja">{r.kata}</span>
+                              <span className="allwords-detail-related-arti">{r.arti}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      className="allwords-detail-jump"
+                      onClick={() => handleJumpToCard(item._index)}
+                    >
+                      Buka di mode Hafalan
+                    </button>
+                  </div>
+                )}
+              </div>
             )
           })}
         </div>
