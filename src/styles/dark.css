@@ -125,3 +125,24 @@
   background: var(--accent);
   color: #14202b;
 }
+
+/* Badge "Nomor #n": latar kuning terang, jadi teksnya harus gelap
+   agar terbaca (sebelumnya pakai warna ink terang → tak terlihat). */
+:root[data-theme='dark'] .flashcard-note-label {
+  color: #6b5a12;
+}
+
+:root[data-theme='dark'] .flashcard-note-value {
+  color: #2b2a26;
+}
+
+/* Semua teks di atas latar highlight kuning (--highlight) harus gelap
+   di mode gelap; kalau tidak, teks terang di atas kuning jadi samar. */
+:root[data-theme='dark'] .subtitle-level,
+:root[data-theme='dark'] .tab.is-active {
+  color: #2b2a26;
+}
+
+:root[data-theme='dark'] ::selection {
+  color: #2b2a26;
+}
