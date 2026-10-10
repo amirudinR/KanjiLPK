@@ -17,22 +17,12 @@ Panduan untuk AI agent (atau developer) yang mengerjakan proyek ini.
 | Folder kerja | `D:\LPK\KanjiLPK-asli` |
 | Proyek Vercel | `kanjilpk` (team `amirs-projects-e5d6b990`) |
 
-## Penting — Jangan Terkecoh
+## Penting
 
-- Folder `D:\LPK\kanji-hafalan` **BUKAN** proyek ini. Folder itu berisi proyek
-  **Kotoba** (kosakata Minna no Nihongo) dan terhubung ke repo `kotoba50bab`.
-  Nama foldernya menyesatkan.
-- Proyek Kanji yang benar ada di **`D:\LPK\KanjiLPK-asli`**.
-- Repo `KanjiLPK` pernah keliru ditimpa kode Kotoba (force push). Sudah dipulihkan.
-  Backup kode Kotoba yang salah masuk ada di branch `backup/kotoba-terlanjur`
-  (di remote `KanjiLPK`) — hanya untuk arsip, jangan dipakai.
-
-## Repo Terkait
-
-| Proyek | Repo | Domain Vercel |
-| --- | --- | --- |
-| Kanji (proyek ini) | `amirudinR/KanjiLPK` | `kanjilpk.vercel.app` |
-| Kotoba (beda proyek) | `amirudinR/kotoba50bab` | `kotoba50bab.vercel.app` |
+- Folder `D:\LPK\kanji-hafalan` **BUKAN** proyek ini (nama folder menyesatkan).
+  Proyek Kanji yang benar ada di **`D:\LPK\KanjiLPK-asli`**.
+- Repo `KanjiLPK` pernah keliru ditimpa kode proyek lain (force push). Sudah
+  dipulihkan ke versi Kanji asli.
 
 ## Menjalankan
 
