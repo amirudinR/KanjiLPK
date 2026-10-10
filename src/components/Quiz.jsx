@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import SpeakerButton from './SpeakerButton.jsx'
 import QuizOptions from './quiz/QuizOptions.jsx'
 import QuizFeedback from './quiz/QuizFeedback.jsx'
@@ -22,7 +22,6 @@ function Quiz({
   const [announcement, setAnnouncement] = useState('')
   const [sessionItems, setSessionItems] = useState(items)
 
-  // Reset the quiz when the item list changes (adjust state during render).
   if (items !== sessionItems) {
     setSessionItems(items)
     setSession(buildSession(items, SESSION_SIZE))
@@ -77,11 +76,33 @@ function Quiz({
     setIndex((value) => value + 1)
   }, [])
 
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return
+      if (isAnswered) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          handleNext()
+        }
+        return
+      }
+      const num = parseInt(e.key)
+      if (num >= 1 && num <= options.length) {
+        e.preventDefault()
+        handleAnswer(options[num - 1])
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [isAnswered, options, handleAnswer, handleNext])
+
   if (items.length === 0) {
     return (
       <div className="quiz">
-        <div className="quiz-card">
+        <div className="quiz-card quiz-empty-card">
+          <span className="quiz-empty-icon" aria-hidden="true">問</span>
           <p className="quiz-empty">Belum ada kanji untuk dikuis.</p>
+          <p className="quiz-empty-sub">Tandai beberapa kata sebagai hafal di tab Hafalan dulu.</p>
         </div>
       </div>
     )

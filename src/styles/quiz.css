@@ -239,10 +239,39 @@
   white-space: nowrap;
 }
 
+.quiz-empty-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 60px 20px;
+}
+
+.quiz-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  font-family: var(--font-jp);
+  font-size: 2.4rem;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
 .quiz-empty {
   text-align: center;
   font-family: var(--font-hand);
   font-size: 1.6rem;
   color: var(--ink-soft);
   margin: 0;
+}
+
+.quiz-empty-sub {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ink-faint);
+  font-style: italic;
 }

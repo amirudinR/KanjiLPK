@@ -10,11 +10,13 @@ import NotebookHeader from './components/NotebookHeader.jsx'
 import TabNav from './components/TabNav.jsx'
 import ProgressStrip from './components/ProgressStrip.jsx'
 import Dashboard from './components/Dashboard.jsx'
+import AllWords from './components/AllWords.jsx'
 import './styles/index.css'
 
 const TABS = [
   { id: 'belajar', label: 'Hafalan', icon: 'card' },
   { id: 'kuis', label: 'Kuis', icon: 'quiz' },
+  { id: 'semua', label: 'Semua', icon: 'grid' },
   { id: 'progres', label: 'Progres', icon: 'chart' },
 ]
 
@@ -113,6 +115,17 @@ function App() {
               onCorrect={markKnown}
               onWrong={markLearning}
               {...speechProps}
+            />
+          )}
+
+          {tab === 'semua' && (
+            <AllWords
+              items={kosakataJft}
+              statusFor={statusFor}
+              onJumpToCard={(i) => {
+                setIndex(i)
+                setTab('belajar')
+              }}
             />
           )}
 

@@ -5,23 +5,6 @@ import JumpList from './flashcard/JumpList.jsx'
 import FlashcardControls from './flashcard/FlashcardControls.jsx'
 import { kanjiDetails, relatedWords } from '../utils/kanjiDetail.js'
 
-/**
- * Mode hafalan kartu BERURUTAN: satu kosakata per kartu, bisa dibalik
- * untuk melihat cara baca dan arti. Tersedia tombol pelafalan (audio).
- *
- * @param {object} props
- * @param {Array<{id:number|string, kata:string, baca:string, arti:string}>} props.items
- * @param {number} props.index - index kosakata yang sedang ditampilkan
- * @param {() => void} props.onPrev
- * @param {() => void} props.onNext
- * @param {(i: number) => void} props.onJump
- * @param {(id: number|string) => 'known'|'learning'|'new'} props.statusFor
- * @param {(id: number|string) => void} props.onToggleKnown
- * @param {(id: number|string) => void} props.onMarkLearning
- * @param {(text:string) => void} props.onSpeak - bacakan teks
- * @param {boolean} props.speechSupported
- * @param {boolean} props.hasJapaneseVoice
- */
 function Flashcard({
   items = [],
   index = 0,
@@ -36,23 +19,19 @@ function Flashcard({
   hasJapaneseVoice = false,
 }) {
   const [flipped, setFlipped] = useState(false)
-  // Menyimpan index terakhir yang dilihat untuk mendeteksi pergantian kartu.
+  const [slideDir, setSlideDir] = useState(0)
   const [lastIndex, setLastIndex] = useState(index)
   const flipButtonRef = useRef(null)
   const total = items.length
   const safeIndex = total > 0 ? Math.min(Math.max(index, 0), total - 1) : 0
   const item = total > 0 ? items[safeIndex] : null
 
-  // Setiap ganti kosakata, kartu otomatis kembali ke sisi depan.
-  // Direset saat render (pola React "adjusting state on prop change") agar
-  // tidak memicu render berantai lewat effect seperti yang ditandai linter.
   if (lastIndex !== safeIndex) {
+    setSlideDir(safeIndex > lastIndex ? 1 : -1)
     setLastIndex(safeIndex)
     setFlipped(false)
   }
 
-  // Saat kartu dibalik, kembalikan fokus ke tombol flip agar pengguna keyboard
-  // tidak kehilangan posisi (fokus tetap di kontrol, bukan dipindah ke sidebar).
   useEffect(() => {
     if (flipped) {
       flipButtonRef.current?.focus?.({ preventScroll: true })
@@ -62,6 +41,47 @@ function Flashcard({
   const toggleFlip = useCallback(() => {
     setFlipped((v) => !v)
   }, [])
+
+  const handlePrev = useCallback(() => {
+    if (safeIndex > 0) onPrev?.()
+  }, [safeIndex, onPrev])
+
+  const handleNext = useCallback(() => {
+    if (safeIndex < total - 1) onNext?.()
+  }, [safeIndex, total, onNext])
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return
+      switch (e.key) {
+        case ' ':
+        case 'Enter':
+          if (e.target === document.body || e.target === flipButtonRef.current) {
+            e.preventDefault()
+            toggleFlip()
+          }
+          break
+        case 'ArrowLeft':
+          e.preventDefault()
+          handlePrev()
+          break
+        case 'ArrowRight':
+          e.preventDefault()
+          handleNext()
+          break
+        case 'k':
+        case 'K':
+          if (item) onToggleKnown?.(item.id)
+          break
+        case 'l':
+        case 'L':
+          if (item) onMarkLearning?.(item.id)
+          break
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [toggleFlip, handlePrev, handleNext, item, onToggleKnown, onMarkLearning])
 
   const onCardKeyDown = useCallback(
     (event) => {
@@ -78,7 +98,6 @@ function Flashcard({
     [item, statusFor],
   )
 
-  // Data tambahan untuk sisi balik (dari dataset + kamus kanji).
   const kanjiInfoList = useMemo(
     () => (item ? kanjiDetails(item.kata) : []),
     [item],
@@ -91,23 +110,29 @@ function Flashcard({
   if (!item) {
     return (
       <section className="flashcard" aria-label="Mode hafalan kartu">
-        <p className="flashcard-empty">Belum ada kosakata untuk dihafal.</p>
+        <div className="flashcard-empty">
+          <span className="flashcard-empty-icon" aria-hidden="true">書</span>
+          <p>Belum ada kosakata untuk dihafal.</p>
+        </div>
       </section>
     )
   }
 
   const progress = total > 0 ? ((safeIndex + 1) / total) * 100 : 0
   const isKnown = status === 'known'
-  // Selalu bacakan CARA BACA (furigana) agar pengucapan akurat,
-  // karena TTS sering salah bila membaca kanji langsung.
   const speakWord = () => onSpeak?.(item.baca || item.kata)
 
   return (
     <section className="flashcard" aria-label="Mode hafalan kartu">
       <header className="flashcard-header">
-        <p className="flashcard-counter">
-          Kosakata <strong>{safeIndex + 1}</strong> dari {total}
-        </p>
+        <div className="flashcard-counter-row">
+          <p className="flashcard-counter">
+            Kosakata <strong>{safeIndex + 1}</strong> dari {total}
+          </p>
+          <span className="flashcard-keyboard-hint" aria-hidden="true">
+            Space: balik · ←→: navigasi
+          </span>
+        </div>
         <div
           className="flashcard-progress"
           role="progressbar"
@@ -116,16 +141,13 @@ function Flashcard({
           aria-valuenow={safeIndex + 1}
           aria-label={`Progres hafalan: kosakata ${safeIndex + 1} dari ${total}`}
         >
-          <div
-            className="flashcard-progress-bar"
-            style={{ width: `${progress}%` }}
-          />
+          <div className="flashcard-progress-bar" style={{ width: `${progress}%` }} />
         </div>
       </header>
 
       <div className="flashcard-main">
         <div
-          className={`flashcard-flip ${flipped ? 'is-flipped' : ''}`}
+          className={`flashcard-flip ${flipped ? 'is-flipped' : ''} ${slideDir !== 0 ? `slide-${slideDir > 0 ? 'right' : 'left'}` : ''}`}
           onClick={toggleFlip}
           onKeyDown={onCardKeyDown}
           role="button"
@@ -145,7 +167,6 @@ function Flashcard({
               speechSupported={speechSupported}
               hasJapaneseVoice={hasJapaneseVoice}
             />
-
             <FlashcardBack
               item={item}
               kanjiInfoList={kanjiInfoList}
@@ -157,14 +178,14 @@ function Flashcard({
             />
           </div>
         </div>
-
-        <JumpList
-          items={items}
-          safeIndex={safeIndex}
-          statusFor={statusFor}
-          onJump={onJump}
-        />
       </div>
+
+      <JumpList
+        items={items}
+        safeIndex={safeIndex}
+        statusFor={statusFor}
+        onJump={onJump}
+      />
 
       <FlashcardControls
         item={item}
@@ -173,8 +194,8 @@ function Flashcard({
         flipped={flipped}
         isKnown={isKnown}
         flipButtonRef={flipButtonRef}
-        onPrev={onPrev}
-        onNext={onNext}
+        onPrev={handlePrev}
+        onNext={handleNext}
         onToggleFlip={toggleFlip}
         onToggleKnown={onToggleKnown}
         onMarkLearning={onMarkLearning}

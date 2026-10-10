@@ -18,21 +18,16 @@
   }
 
   .flashcard-main {
-    grid-template-columns: 1fr;
     gap: 16px;
   }
 
-  /* Panel lompat cepat di mobile: tidak lagi sticky & tidak terpotong. */
   .flashcard-sidebar {
-    order: 2;
-    position: static;
-    max-height: none;
+    margin-top: 12px;
   }
 
   .flashcard-jump-list {
     grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
-    /* Tinggi menyesuaikan isi; scroll hanya bila daftar sangat panjang. */
-    max-height: min(48vh, 340px);
+    max-height: min(40vh, 280px);
     overflow-y: auto;
   }
 
@@ -126,5 +121,47 @@
 
   .notebook-title h1 {
     font-size: 1.75rem;
+  }
+
+  /* AllWords mobile */
+  .allwords-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .allwords-controls {
+    width: 100%;
+  }
+
+  .allwords-search-input {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .allwords-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+  }
+
+  .allwords-card {
+    padding: 12px 8px;
+  }
+
+  .allwords-card-kata {
+    font-size: 1.6rem;
+  }
+
+  .allwords-card-baca {
+    font-size: 0.8rem;
+  }
+
+  .allwords-card-arti {
+    font-size: 0.78rem;
+  }
+
+  .allwords-view-btn,
+  .allwords-filter-btn {
+    padding: 8px 10px;
+    font-size: 0.88rem;
   }
 }

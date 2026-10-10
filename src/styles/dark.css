@@ -72,3 +72,56 @@
 :root[data-theme='dark'] .flashcard-kanji-line {
   color: var(--accent-deep);
 }
+
+/* Dashboard */
+:root[data-theme='dark'] .dashboard-progress-fill {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--success),
+    var(--success) 8px,
+    #5aa86e 8px,
+    #5aa86e 16px
+  );
+}
+
+:root[data-theme='dark'] .stat-icon {
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+}
+
+:root[data-theme='dark'] .btn-primary {
+  color: #14202b;
+  border-color: #4f8fbf;
+}
+
+:root[data-theme='dark'] .btn-danger-confirm {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* Empty states */
+:root[data-theme='dark'] .flashcard-empty-icon,
+:root[data-theme='dark'] .quiz-empty-icon,
+:root[data-theme='dark'] .allwords-empty-icon {
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+}
+
+/* AllWords */
+:root[data-theme='dark'] .allwords-card-known {
+  border-left-color: var(--success);
+}
+
+:root[data-theme='dark'] .allwords-card-learning {
+  border-left-color: var(--highlight);
+}
+
+:root[data-theme='dark'] .allwords-clear-btn {
+  color: var(--accent-deep);
+  border-color: var(--accent);
+}
+
+:root[data-theme='dark'] .allwords-clear-btn:hover {
+  background: var(--accent);
+  color: #14202b;
+}
