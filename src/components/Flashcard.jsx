@@ -30,6 +30,13 @@ function Flashcard({
       return 'right'
     }
   })
+  const [cardCollapsed, setCardCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('kanji-notebook:card-collapsed') === '1'
+    } catch {
+      return false
+    }
+  })
   const flipButtonRef = useRef(null)
 
   const toggleAsideSide = useCallback(() => {
@@ -37,6 +44,18 @@ function Flashcard({
       const next = side === 'right' ? 'left' : 'right'
       try {
         localStorage.setItem('kanji-notebook:aside-side', next)
+      } catch {
+        /* localStorage tak tersedia — abaikan */
+      }
+      return next
+    })
+  }, [])
+
+  const toggleCardCollapsed = useCallback(() => {
+    setCardCollapsed((v) => {
+      const next = !v
+      try {
+        localStorage.setItem('kanji-notebook:card-collapsed', next ? '1' : '0')
       } catch {
         /* localStorage tak tersedia — abaikan */
       }
@@ -155,6 +174,33 @@ function Flashcard({
           </span>
           <button
             type="button"
+            className="flashcard-card-toggle"
+            onClick={toggleCardCollapsed}
+            title={cardCollapsed ? 'Buka kartu' : 'Tutup kartu (lebih lega)'}
+            aria-label={cardCollapsed ? 'Buka kartu' : 'Tutup kartu'}
+            aria-expanded={!cardCollapsed}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              {cardCollapsed ? (
+                <path d="M6 9l6 6 6-6" />
+              ) : (
+                <path d="M6 15l6-6 6 6" />
+              )}
+            </svg>
+            {cardCollapsed ? 'Buka Kartu' : 'Tutup Kartu'}
+          </button>
+          <button
+            type="button"
             className="flashcard-aside-toggle"
             onClick={toggleAsideSide}
             title="Pindah panel Lompat Cepat ke kiri/kanan"
@@ -196,7 +242,9 @@ function Flashcard({
         </div>
       </header>
 
-      <div className={`flashcard-main ${asideSide === 'left' ? 'is-aside-left' : ''}`}>
+      <div
+        className={`flashcard-main ${asideSide === 'left' ? 'is-aside-left' : ''} ${cardCollapsed ? 'is-card-collapsed' : ''}`}
+      >
         <div
           className={`flashcard-flip ${flipped ? 'is-flipped' : ''} ${slideDir !== 0 ? `slide-${slideDir > 0 ? 'right' : 'left'}` : ''}`}
           onClick={toggleFlip}
@@ -230,26 +278,26 @@ function Flashcard({
           </div>
         </div>
 
+        <FlashcardControls
+          item={item}
+          safeIndex={safeIndex}
+          total={total}
+          flipped={flipped}
+          isKnown={isKnown}
+          flipButtonRef={flipButtonRef}
+          onPrev={handlePrev}
+          onNext={handleNext}
+          onToggleFlip={toggleFlip}
+          onToggleKnown={onToggleKnown}
+          onMarkLearning={onMarkLearning}
+        />
+
         <div className="flashcard-aside">
           <JumpList
             items={items}
             safeIndex={safeIndex}
             statusFor={statusFor}
             onJump={onJump}
-          />
-
-          <FlashcardControls
-            item={item}
-            safeIndex={safeIndex}
-            total={total}
-            flipped={flipped}
-            isKnown={isKnown}
-            flipButtonRef={flipButtonRef}
-            onPrev={handlePrev}
-            onNext={handleNext}
-            onToggleFlip={toggleFlip}
-            onToggleKnown={onToggleKnown}
-            onMarkLearning={onMarkLearning}
           />
         </div>
       </div>

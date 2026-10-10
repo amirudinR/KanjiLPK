@@ -69,6 +69,7 @@
 }
 
 /* Tombol pindah panel Lompat Cepat kiri/kanan — hanya tampil di desktop. */
+.flashcard-card-toggle,
 .flashcard-aside-toggle {
   display: none;
   align-items: center;
@@ -86,6 +87,7 @@
     transform 140ms ease;
 }
 
+.flashcard-card-toggle:hover,
 .flashcard-aside-toggle:hover {
   color: var(--accent-deep);
   border-color: var(--accent);
@@ -733,35 +735,102 @@
     flex: none;
   }
 
-  /* Kartu di kiri, panel "Lompat Cepat" + tombol kontrol di kanan.
-     Dua kolom berdampingan; tinggi baris mengisi sisa tinggi kartu. */
+  /* Tiga kolom berdampingan: kartu | tombol kontrol | Lompat Cepat.
+     Tinggi baris mengisi sisa tinggi kartu hafalan. */
   .flashcard-main {
     flex: 1 1 auto;
     min-height: 0;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-columns: minmax(0, 1fr) 220px 320px;
     grid-template-rows: minmax(0, 1fr);
     gap: 14px;
     align-items: stretch;
   }
 
-  /* Panel dipindah ke kiri (urutan kolom dibalik). */
-  .flashcard-main.is-aside-left {
-    grid-template-columns: 320px minmax(0, 1fr);
-  }
-
-  .flashcard-main.is-aside-left .flashcard-flip {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .flashcard-main.is-aside-left .flashcard-aside {
+  /* Kartu (kolom 1), kontrol (kolom 2), Lompat Cepat (kolom 3). */
+  .flashcard-main > .flashcard-flip {
     grid-column: 1;
     grid-row: 1;
   }
 
+  .flashcard-main > .flashcard-controls {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .flashcard-main > .flashcard-aside {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  /* Panel Lompat Cepat dipindah ke kiri: sidebar | kartu | kontrol. */
+  .flashcard-main.is-aside-left {
+    grid-template-columns: 320px 220px minmax(0, 1fr);
+  }
+
+  .flashcard-main.is-aside-left > .flashcard-aside {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .flashcard-main.is-aside-left > .flashcard-flip {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  /* Kartu ditutup: sembunyikan kartu & kompakkan kolomnya. */
+  .flashcard-main.is-card-collapsed > .flashcard-flip {
+    display: none;
+  }
+
+  .flashcard-main.is-card-collapsed {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .flashcard-main.is-card-collapsed > .flashcard-controls {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .flashcard-main.is-card-collapsed > .flashcard-aside {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .flashcard-main.is-card-collapsed.is-aside-left {
+    grid-template-columns: minmax(0, 1fr) 220px;
+  }
+
+  .flashcard-main.is-card-collapsed.is-aside-left > .flashcard-aside {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .flashcard-main.is-card-collapsed.is-aside-left > .flashcard-controls {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .flashcard-card-toggle,
   .flashcard-aside-toggle {
     display: inline-flex;
+  }
+
+  /* Tombol kontrol menumpuk vertikal (kolom tengah). */
+  .flashcard-controls {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 8px;
+    padding-top: 0;
+    margin-top: 0;
+    min-width: 0;
+  }
+
+  .flashcard-btn {
+    width: 100%;
+    padding: 9px 14px;
+    font-size: 0.94rem;
   }
 
   .flashcard-aside {
@@ -844,22 +913,6 @@
   .flashcard-jump {
     font-size: 0.82rem;
     aspect-ratio: 1 / 1;
-  }
-
-  /* Tombol kontrol menumpuk vertikal di kolom kanan. */
-  .flashcard-controls {
-    flex-direction: column;
-    flex-wrap: nowrap;
-    gap: 8px;
-    padding-top: 0;
-    margin-top: 0;
-    flex: none;
-  }
-
-  .flashcard-btn {
-    width: 100%;
-    padding: 9px 14px;
-    font-size: 0.94rem;
   }
 }
 
