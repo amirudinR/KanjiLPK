@@ -24,6 +24,35 @@ Panduan untuk AI agent (atau developer) yang mengerjakan proyek ini.
 - Repo `KanjiLPK` pernah keliru ditimpa kode proyek lain (force push). Sudah
   dipulihkan ke versi Kanji asli.
 
+### PENTING — domain `kanjilpk.vercel.app` bisa "nyangkut" di deploy lama
+
+Pernah terjadi: deploy baru tidak muncul di domain, yang tampil malah versi
+lama/berbeda. Penyebabnya **alias manual** yang mematok domain ke sebuah
+deployment lama (menimpa domain produksi otomatis). Diagnosa & perbaikan:
+
+```bash
+# Lihat apakah domain dipatok manual ke deployment lama
+npx vercel alias ls | Select-String "kanjilpk"
+
+# Hapus patokan lama (jika ada alias kanjilpk.vercel.app -> deployment lama)
+npx vercel alias rm kanjilpk.vercel.app --yes
+
+# Deploy ulang supaya domain mengarah ke versi terbaru
+npx vercel --prod
+```
+
+Cek hasil:
+```bash
+(Invoke-WebRequest https://kanjilpk.vercel.app -UseBasicParsing).Content -match '<title>(.*?)</title>'
+```
+Harus memuat `<title>Kanji Notebook`.
+
+### Auto-deploy dari GitHub tidak aktif
+
+Project Vercel `kanjilpk` **tidak** auto-deploy dari push ke repo `KanjiLPK`.
+Setiap ada perubahan, jalankan deploy manual `npx vercel --prod` dari folder ini.
+(Alternatif: hubungkan ulang repo di Dashboard Vercel → Settings → Git.)
+
 ## Fitur
 
 - **Flashcard** — Kartu flip 3D dengan keyboard shortcuts (Space/Enter=flip, ←→=navigasi, K=hafal, L=belajar). Rincian kanji dan contoh kata bisa dibuka-tutup (collapsible).
@@ -45,12 +74,15 @@ npm run lint     # oxlint
 
 ## Deploy
 
-Push ke `main` di `KanjiLPK` → Vercel `kanjilpk` auto-deploy.
-Deploy manual (dari folder ini):
+Auto-deploy GitHub **tidak** aktif untuk proyek ini. Deploy manual dari folder
+ini setelah setiap perubahan:
 
 ```bash
 npx vercel --prod
 ```
+
+Jika domain `kanjilpk.vercel.app` tidak menampilkan versi terbaru, cek & hapus
+alias lama (lihat bagian "PENTING — domain nyangkut" di atas).
 
 ## Struktur
 
