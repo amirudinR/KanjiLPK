@@ -75,7 +75,7 @@
 /* Kartu yang bisa dibalik */
 .flashcard-flip {
   position: relative;
-  min-height: 440px;
+  min-height: 360px;
   perspective: 1600px;
   cursor: pointer;
 }
@@ -83,7 +83,7 @@
 .flashcard-inner {
   position: relative;
   width: 100%;
-  min-height: 440px;
+  min-height: 360px;
   transition: transform 560ms cubic-bezier(0.34, 1.16, 0.64, 1);
   transform-style: preserve-3d;
 }
@@ -684,3 +684,76 @@
   font-size: 1.6rem;
   color: var(--ink-soft);
 }
+
+/* ==========================================================================
+   Desktop — usahakan seluruh mode hafalan muat dalam satu layar
+   tanpa perlu scroll (kartu, lompat cepat, dan tombol kontrol sekaligus).
+   ========================================================================== */
+@media (min-width: 761px) and (min-height: 620px) {
+  .flashcard {
+    gap: 12px;
+  }
+
+  .flashcard-counter {
+    margin-bottom: 6px;
+  }
+
+  /* Tinggi kartu mengikuti viewport, dengan batas atas supaya tidak
+     berlebihan di layar besar. */
+  .flashcard-flip,
+  .flashcard-inner {
+    min-height: clamp(300px, 42vh, 440px);
+  }
+
+  .flashcard-kanji {
+    font-size: clamp(4rem, 14vh, 8rem);
+  }
+
+  .flashcard-hint {
+    margin-top: 12px;
+    font-size: 1.25rem;
+  }
+
+  .flashcard-audio {
+    margin-top: 12px;
+  }
+
+  .flashcard-back-head {
+    margin: 2px 0 12px;
+    padding-bottom: 10px;
+  }
+
+  .flashcard-details {
+    gap: 6px;
+  }
+
+  .flashcard-sidebar {
+    margin-top: 12px;
+    padding: 10px 12px;
+  }
+
+  .flashcard-sidebar-title {
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+  }
+
+  .flashcard-jump-list {
+    grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+    gap: 5px;
+    max-height: 96px;
+  }
+
+  .flashcard-jump {
+    font-size: 0.85rem;
+  }
+
+  .flashcard-controls {
+    padding-top: 0;
+  }
+
+  .flashcard-btn {
+    padding: 9px 16px;
+    font-size: 0.96rem;
+  }
+}
+
