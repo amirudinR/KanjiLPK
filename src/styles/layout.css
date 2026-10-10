@@ -384,16 +384,38 @@
    Hanya berlaku di layar lebar (>=761px), jadi tampilan ponsel tak terpengaruh.
    ========================================================================== */
 @media (min-width: 761px) and (min-height: 620px) {
+  /* Kunci seluruh rantai ke tinggi viewport supaya TIDAK ADA scroll.
+     Hanya area kartu yang fleksibel. */
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    min-height: 0;
+  }
+
+  #root {
+    height: 100%;
+  }
+
   .app {
+    height: 100%;
+    align-items: stretch;
     padding: 14px clamp(12px, 2.4vw, 26px);
   }
 
   .notebook {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     padding: 18px clamp(18px, 3vw, 40px) 14px;
   }
 
   .notebook-head {
     padding-bottom: 10px;
+    flex: none;
   }
 
   .notebook-title-icon {
@@ -416,6 +438,7 @@
 
   .tabs {
     margin-top: 12px;
+    flex: none;
   }
 
   .tab {
@@ -425,15 +448,32 @@
 
   .progress-strip {
     padding: 8px 4px 12px;
+    flex: none;
   }
 
+  /* Badan buku menyerap sisa tinggi. Tab Hafalan dirancang muat penuh
+     tanpa scroll; tab lain (Kuis/Semua/Progres) boleh scroll di dalam
+     area ini, jadi halaman utama tetap tidak ikut memanjang. */
   .notebook-body {
+    flex: 1 1 auto;
+    min-height: 0;
     padding: 4px 0 6px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .notebook-body > .flashcard {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .notebook-foot {
     margin-top: 12px;
     padding-top: 10px;
     font-size: 0.9rem;
+    flex: none;
   }
 }
