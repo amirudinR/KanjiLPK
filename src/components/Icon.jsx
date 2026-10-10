@@ -72,6 +72,20 @@ const PATHS = {
       <path d="m21 21-4.3-4.3" />
     </>
   ),
+  download: (
+    <>
+      <path d="M12 3v12" />
+      <path d="m7 10 5 5 5-5" />
+      <path d="M4 21h16" />
+    </>
+  ),
+  upload: (
+    <>
+      <path d="M12 21V9" />
+      <path d="m7 14 5-5 5 5" />
+      <path d="M4 3h16" />
+    </>
+  ),
 }
 
 /**

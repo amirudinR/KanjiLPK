@@ -211,6 +211,44 @@
   color: var(--accent-deep);
 }
 
+.flashcard-collapsible-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--paper-2);
+  border: 1.5px solid var(--paper-edge);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 130ms ease, border-color 130ms ease;
+}
+
+.flashcard-collapsible-toggle:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.flashcard-collapsible-toggle dt {
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+  color: var(--ink);
+  margin: 0;
+}
+
+.flashcard-collapsible-icon {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  flex: none;
+}
+
 .flashcard-detail-baca {
   display: flex;
   align-items: center;

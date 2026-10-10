@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Icon from './Icon.jsx'
 
 /**
@@ -37,6 +37,20 @@ function AllWords({ items, statusFor, onJumpToCard }) {
   const handleJumpToCard = (index) => {
     onJumpToCard(index)
   }
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return
+      if (e.key === 'g' || e.key === 'G') setView('grid')
+      if (e.key === 'l' || e.key === 'L') setView('list')
+      if (e.key === '/') {
+        e.preventDefault()
+        document.querySelector('.allwords-search-input')?.focus()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
 
   return (
     <section className="allwords" aria-label="Semua kosakata">

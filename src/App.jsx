@@ -35,7 +35,10 @@ function App() {
     markKnown,
     markLearning,
     resetAll,
+    exportProgress,
+    importProgress,
     counts,
+    streak,
   } = useProgress(total)
 
   const progressPercent = total ? Math.round((counts.known / total) * 100) : 0
@@ -135,6 +138,9 @@ function App() {
               total={total}
               onContinue={() => setTab('belajar')}
               onReset={handleReset}
+              streak={streak}
+              onExport={exportProgress}
+              onImport={importProgress}
             />
           )}
         </main>

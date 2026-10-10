@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Icon from './Icon.jsx'
 
 function Stat({ value, label, tone, sub, icon }) {
@@ -16,8 +16,10 @@ function Stat({ value, label, tone, sub, icon }) {
   )
 }
 
-function Dashboard({ counts, total, onContinue, onReset }) {
+function Dashboard({ counts, total, onContinue, onReset, streak, onExport, onImport }) {
   const [confirming, setConfirming] = useState(false)
+  const [importMessage, setImportMessage] = useState('')
+  const fileInputRef = useRef(null)
   const pct = total > 0 ? Math.round((counts.known / total) * 100) : 0
   const remaining = total - counts.known
 
@@ -31,6 +33,19 @@ function Dashboard({ counts, total, onContinue, onReset }) {
     }
   }
 
+  const handleImportFile = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const result = onImport(ev.target?.result)
+      setImportMessage(result ? 'Progres berhasil diimpor!' : 'Gagal mengimpor file.')
+      setTimeout(() => setImportMessage(''), 3000)
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
+
   return (
     <section className="dashboard" aria-label="Ringkasan progres">
       <h2 className="dashboard-title">Ringkasan Progres</h2>
@@ -38,6 +53,17 @@ function Dashboard({ counts, total, onContinue, onReset }) {
         Pantau seberapa jauh hafalanmu. Buka tab <strong>Hafalan</strong> untuk
         menandai kosakata satu per satu.
       </p>
+
+      {streak.count > 0 && (
+        <div className="dashboard-streak">
+          <span className="dashboard-streak-icon" aria-hidden="true">
+            <Icon name="star" />
+          </span>
+          <span className="dashboard-streak-text">
+            <strong>{streak.count}</strong> hari berturut-turut!
+          </span>
+        </div>
+      )}
 
       <div className="dashboard-progress">
         <div className="dashboard-progress-header">
@@ -84,6 +110,42 @@ function Dashboard({ counts, total, onContinue, onReset }) {
           </span>
           {confirming ? 'Klik lagi untuk konfirmasi' : 'Reset Progres'}
         </button>
+      </div>
+
+      <div className="dashboard-backup">
+        <h3 className="dashboard-backup-title">Backup & Restore</h3>
+        <p className="dashboard-backup-desc">
+          Simpan progresmu ke file atau pulihkan dari backup sebelumnya.
+        </p>
+        <div className="dashboard-backup-actions">
+          <button type="button" className="btn btn-ghost" onClick={onExport}>
+            <span className="btn-icon" aria-hidden="true">
+              <Icon name="download" />
+            </span>
+            Export Progres
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <span className="btn-icon" aria-hidden="true">
+              <Icon name="upload" />
+            </span>
+            Import Progres
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            className="sr-only"
+            onChange={handleImportFile}
+            aria-label="Pilih file backup untuk diimpor"
+          />
+        </div>
+        {importMessage && (
+          <p className="dashboard-import-message" role="status">{importMessage}</p>
+        )}
       </div>
     </section>
   )
