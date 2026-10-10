@@ -21,7 +21,28 @@ function Flashcard({
   const [flipped, setFlipped] = useState(false)
   const [slideDir, setSlideDir] = useState(0)
   const [lastIndex, setLastIndex] = useState(index)
+  const [asideSide, setAsideSide] = useState(() => {
+    try {
+      return localStorage.getItem('kanji-notebook:aside-side') === 'left'
+        ? 'left'
+        : 'right'
+    } catch {
+      return 'right'
+    }
+  })
   const flipButtonRef = useRef(null)
+
+  const toggleAsideSide = useCallback(() => {
+    setAsideSide((side) => {
+      const next = side === 'right' ? 'left' : 'right'
+      try {
+        localStorage.setItem('kanji-notebook:aside-side', next)
+      } catch {
+        /* localStorage tak tersedia — abaikan */
+      }
+      return next
+    })
+  }, [])
   const total = items.length
   const safeIndex = total > 0 ? Math.min(Math.max(index, 0), total - 1) : 0
   const item = total > 0 ? items[safeIndex] : null
@@ -132,6 +153,36 @@ function Flashcard({
           <span className="flashcard-keyboard-hint" aria-hidden="true">
             Space: balik · ←→: navigasi
           </span>
+          <button
+            type="button"
+            className="flashcard-aside-toggle"
+            onClick={toggleAsideSide}
+            title="Pindah panel Lompat Cepat ke kiri/kanan"
+            aria-label={
+              asideSide === 'right'
+                ? 'Pindahkan panel Lompat Cepat ke kiri'
+                : 'Pindahkan panel Lompat Cepat ke kanan'
+            }
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              {asideSide === 'right' ? (
+                <path d="M14 8l-4 4 4 4M20 4v16" />
+              ) : (
+                <path d="M10 8l4 4-4 4M4 4v16" />
+              )}
+            </svg>
+            Panel: {asideSide === 'right' ? 'Kanan' : 'Kiri'}
+          </button>
         </div>
         <div
           className="flashcard-progress"
@@ -145,7 +196,7 @@ function Flashcard({
         </div>
       </header>
 
-      <div className="flashcard-main">
+      <div className={`flashcard-main ${asideSide === 'left' ? 'is-aside-left' : ''}`}>
         <div
           className={`flashcard-flip ${flipped ? 'is-flipped' : ''} ${slideDir !== 0 ? `slide-${slideDir > 0 ? 'right' : 'left'}` : ''}`}
           onClick={toggleFlip}
@@ -178,28 +229,30 @@ function Flashcard({
             />
           </div>
         </div>
+
+        <div className="flashcard-aside">
+          <JumpList
+            items={items}
+            safeIndex={safeIndex}
+            statusFor={statusFor}
+            onJump={onJump}
+          />
+
+          <FlashcardControls
+            item={item}
+            safeIndex={safeIndex}
+            total={total}
+            flipped={flipped}
+            isKnown={isKnown}
+            flipButtonRef={flipButtonRef}
+            onPrev={handlePrev}
+            onNext={handleNext}
+            onToggleFlip={toggleFlip}
+            onToggleKnown={onToggleKnown}
+            onMarkLearning={onMarkLearning}
+          />
+        </div>
       </div>
-
-      <JumpList
-        items={items}
-        safeIndex={safeIndex}
-        statusFor={statusFor}
-        onJump={onJump}
-      />
-
-      <FlashcardControls
-        item={item}
-        safeIndex={safeIndex}
-        total={total}
-        flipped={flipped}
-        isKnown={isKnown}
-        flipButtonRef={flipButtonRef}
-        onPrev={handlePrev}
-        onNext={handleNext}
-        onToggleFlip={toggleFlip}
-        onToggleKnown={onToggleKnown}
-        onMarkLearning={onMarkLearning}
-      />
     </section>
   )
 }

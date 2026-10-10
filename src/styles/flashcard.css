@@ -44,6 +44,10 @@
   flex-direction: column;
 }
 
+.flashcard-aside {
+  display: contents;
+}
+
 .flashcard-counter-row {
   display: flex;
   align-items: baseline;
@@ -52,11 +56,40 @@
   flex-wrap: wrap;
 }
 
+/* Hint keyboard & tombol panel didorong ke kanan. */
+.flashcard-keyboard-hint {
+  margin-left: auto;
+}
+
 .flashcard-keyboard-hint {
   font-family: var(--font-note);
   font-size: 0.82rem;
   color: var(--ink-faint);
   font-style: italic;
+}
+
+/* Tombol pindah panel Lompat Cepat kiri/kanan — hanya tampil di desktop. */
+.flashcard-aside-toggle {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-note);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  background: var(--card);
+  border: 1.5px solid var(--paper-edge);
+  border-radius: 999px;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease;
+}
+
+.flashcard-aside-toggle:hover {
+  color: var(--accent-deep);
+  border-color: var(--accent);
+  transform: translateY(-1px);
 }
 
 @keyframes slideInRight {
@@ -694,6 +727,41 @@
     gap: 9px;
   }
 
+  /* Kartu di kiri, panel "Lompat Cepat" + tombol kontrol di kanan.
+     Dua kolom berdampingan (bukan atas-bawah) supaya hemat tinggi layar. */
+  .flashcard-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  /* Panel dipindah ke kiri (urutan kolom dibalik). */
+  .flashcard-main.is-aside-left {
+    grid-template-columns: 300px minmax(0, 1fr);
+  }
+
+  .flashcard-main.is-aside-left .flashcard-flip {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .flashcard-main.is-aside-left .flashcard-aside {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .flashcard-aside-toggle {
+    display: inline-flex;
+  }
+
+  .flashcard-aside {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+
   .flashcard-counter {
     margin-bottom: 2px;
   }
@@ -702,15 +770,15 @@
     font-size: 1.3rem;
   }
 
-  /* Tinggi kartu mengikuti viewport, dengan batas atas supaya tidak
-     berlebihan di layar besar. */
+  /* Tinggi kartu sekaligus mengisi tinggi kolom kanan. */
   .flashcard-flip,
   .flashcard-inner {
-    min-height: clamp(230px, 32vh, 360px);
+    height: 100%;
+    min-height: clamp(300px, 46vh, 520px);
   }
 
   .flashcard-face {
-    padding: 16px;
+    padding: 20px;
   }
 
   .flashcard-kanji {
@@ -735,33 +803,45 @@
     gap: 4px;
   }
 
+  /* Panel Lompat Cepat di kolom kanan — mengisi sisa tinggi. */
   .flashcard-sidebar {
-    margin-top: 8px;
-    padding: 8px 12px;
+    margin-top: 0;
+    padding: 10px 12px;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   .flashcard-sidebar-title {
     font-size: 1rem;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
 
   .flashcard-jump-list {
-    grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
-    gap: 4px;
-    max-height: 72px;
+    grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+    gap: 5px;
+    max-height: none;
+    flex: 1 1 auto;
+    min-height: 0;
+    align-content: start;
   }
 
   .flashcard-jump {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
   }
 
+  /* Tombol kontrol menumpuk vertikal di kolom kanan. */
   .flashcard-controls {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 8px;
     padding-top: 0;
     margin-top: 0;
+    flex: none;
   }
 
   .flashcard-btn {
-    padding: 8px 14px;
+    width: 100%;
+    padding: 9px 14px;
     font-size: 0.94rem;
   }
 }
@@ -771,7 +851,7 @@
 @media (min-width: 761px) and (min-height: 620px) and (max-height: 780px) {
   .flashcard-flip,
   .flashcard-inner {
-    min-height: clamp(200px, 28vh, 280px);
+    min-height: clamp(280px, 44vh, 340px);
   }
 
   .flashcard-kanji {
@@ -779,7 +859,8 @@
   }
 
   .flashcard-jump-list {
-    max-height: 60px;
+    grid-template-columns: repeat(auto-fill, minmax(32px, 1fr));
+    gap: 4px;
   }
 }
 
