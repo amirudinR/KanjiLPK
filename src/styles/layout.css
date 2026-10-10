@@ -333,6 +333,7 @@
 /* --- Tab --- */
 .tabs {
   display: flex;
+  align-items: center;
   gap: 8px;
   margin-top: 18px;
   flex-wrap: wrap;
@@ -372,6 +373,47 @@
 .tab-icon {
   display: grid;
   place-items: center;
+}
+
+/* Tombol buka/tutup navigasi tab */
+.tabs-collapse {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 7px 14px;
+  font-family: var(--font-note);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  background: var(--card);
+  border: 2px solid var(--paper-edge);
+  border-radius: 999px;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease;
+}
+
+.tabs-collapse:hover {
+  color: var(--accent-deep);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+/* Tab dalam keadaan terlipat: cukup tampilkan tab aktif + petunjuk */
+.tabs.is-collapsed {
+  margin-top: 12px;
+}
+
+.tab-compact {
+  border-bottom: 2px solid var(--accent);
+}
+
+.tabs-compact-hint {
+  font-family: var(--font-note);
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--ink-faint);
 }
 
 /* --- Strip progres --- */
