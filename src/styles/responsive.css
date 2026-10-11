@@ -289,12 +289,43 @@
   .notebook.is-landscape .flashcard-main > .flashcard-controls {
     grid-column: 2;
     grid-row: 1;
+    /* Reset aturan `@media (max-width: 460px)` yang mengubah kontainer ini
+       jadi grid 2 kolom dan memberi tombol flip `grid-column: 1/-1` +
+       `order: -1`. Kalau tidak direset, tombol "Balik Kartu" membentang
+       dan menimpa tombol lain. Di sini kita paksa kembali jadi kolom flex. */
+    display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
     justify-content: center;
     gap: 8px;
     padding-top: 0;
     margin-top: 0;
+    /* Kolom kontrol hanya 132px: jangan biarkan tombol melar melebihi
+       kolomnya. Tanpa ini, teks tombol yang panjang (mis. "Balik Kartu"
+       atau "Tandai Sedang Belajar") memaksa tombol melebar keluar kolom
+       dan menimpa tombol lain. */
+    min-width: 0;
+    max-width: 100%;
+    align-items: stretch;
+  }
+
+  /* Netralkan posisi khusus tombol flip dari media query ≤460px. */
+  .notebook.is-landscape .flashcard-controls > .flashcard-btn-flip {
+    grid-column: auto;
+    order: 0;
+  }
+
+  /* Setiap tombol dibatasi lebar kolom dan teksnya boleh turun baris,
+     sehingga tinggi seragam dan tidak ada tombol yang menjorok keluar. */
+  .notebook.is-landscape .flashcard-controls > .flashcard-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 100%;
+    height: auto;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.15;
+    text-align: center;
   }
 
   .notebook.is-landscape .flashcard-main > .flashcard-aside {
@@ -311,6 +342,8 @@
 
   .notebook.is-landscape .flashcard-btn {
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
     padding: 7px 8px;
     font-size: 0.8rem;
   }
