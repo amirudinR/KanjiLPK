@@ -118,6 +118,11 @@
   min-height: 360px;
   transition: transform 560ms cubic-bezier(0.34, 1.16, 0.64, 1);
   transform-style: preserve-3d;
+  /* Petunjuk ke GPU agar sisi belakang sudah ter-render sebelum putaran,
+     sehingga tidak ada kedip/garis saat kartu dibalik (khusus WebKit). */
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .flashcard-flip.is-flipped .flashcard-inner {
@@ -138,7 +143,18 @@
   box-shadow: var(--shadow-paper);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  overflow: auto;
+  /* `overflow: hidden` (bukan auto) mencegah WebKit me-repaint isi saat
+     kartu diputar 3D — dengan `auto`, sisi yang berputar sering tampak
+     berkedip/bergaris. Isi panjang tetap bisa di-scroll di dalam
+     .flashcard-back (lihat aturan di bawah). */
+  overflow: hidden;
+}
+
+/* Sisi belakang mengizinkan scroll internal tanpa memicu repaint pada
+   pembungkus 3D. */
+.flashcard-back {
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 /* Sudut kertas terlipat pada sisi depan */

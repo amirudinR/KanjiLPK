@@ -68,10 +68,14 @@ function Flashcard({
   // Reset status balik dilakukan pada event navigasi (lihat handlePrev/
   // handleNext/handleJump), bukan lewat effect, sehingga tidak ada setState
   // di dalam render maupun effect.
+  // Fokus ke tombol flip hanya untuk pengguna keyboard/mouse. Di perangkat
+  // sentuh, memfokuskan tombol memicu scroll + ring fokus yang tampak
+  // seperti kedipan setiap kali kartu dibalik — karena itu dilewati.
   useEffect(() => {
-    if (flipped) {
-      flipButtonRef.current?.focus?.({ preventScroll: true })
-    }
+    if (!flipped) return
+    const usesPointerTouch = window.matchMedia?.('(pointer: coarse)').matches
+    if (usesPointerTouch) return
+    flipButtonRef.current?.focus?.({ preventScroll: true })
   }, [flipped])
 
   const toggleFlip = useCallback(() => {
