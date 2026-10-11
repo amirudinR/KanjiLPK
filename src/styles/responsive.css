@@ -266,9 +266,10 @@
     flex: 1 1 auto;
     min-height: 0;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 170px 240px;
+    /* Kartu dapat ruang terbesar; kontrol & tombol lompat dipersempit. */
+    grid-template-columns: minmax(0, 1fr) 132px 168px;
     grid-template-rows: minmax(0, 1fr);
-    gap: 10px;
+    gap: 8px;
     align-items: stretch;
   }
 
@@ -310,8 +311,8 @@
 
   .notebook.is-landscape .flashcard-btn {
     width: 100%;
-    padding: 9px 10px;
-    font-size: 0.86rem;
+    padding: 7px 8px;
+    font-size: 0.8rem;
   }
 
   .notebook.is-landscape .flashcard-sidebar {
@@ -334,7 +335,14 @@
   }
 
   .notebook.is-landscape .flashcard-kanji {
-    font-size: clamp(3rem, 16vh, 6rem);
+    /* Ukuran mengikuti tinggi area terputar, dengan batas aman. */
+    font-size: clamp(2.2rem, 9vh, 4rem);
+    line-height: 1.05;
+  }
+
+  .notebook.is-landscape .flashcard-hint {
+    margin-top: 6px;
+    font-size: 0.95rem;
   }
 
   .notebook.is-landscape .notebook-foot {
@@ -344,7 +352,7 @@
   /* Saat panel di kiri, balik urutan kolomnya. */
   .notebook.is-landscape
     .flashcard-main.is-aside-left {
-    grid-template-columns: 240px 170px minmax(0, 1fr);
+    grid-template-columns: 168px 132px minmax(0, 1fr);
   }
 
   .notebook.is-landscape
@@ -364,7 +372,7 @@
   /* Kartu ditutup: sembunyikan kartu, kontrol & jumplist melebar. */
   .notebook.is-landscape
     .flashcard-main.is-card-collapsed {
-    grid-template-columns: 170px minmax(0, 1fr);
+    grid-template-columns: 132px minmax(0, 1fr);
   }
 
   .notebook.is-landscape

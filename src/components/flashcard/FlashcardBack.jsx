@@ -60,7 +60,10 @@ function FlashcardBack({
             <button
               type="button"
               className="flashcard-collapsible-toggle"
-              onClick={() => setShowKanji((v) => !v)}
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowKanji((v) => !v)
+              }}
               aria-expanded={showKanji}
             >
               <span className="flashcard-collapsible-label">
@@ -116,7 +119,10 @@ function FlashcardBack({
           <button
             type="button"
             className="flashcard-collapsible-toggle"
-            onClick={() => setShowRelated((v) => !v)}
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowRelated((v) => !v)
+            }}
             aria-expanded={showRelated}
           >
             <span className="flashcard-collapsible-label">
