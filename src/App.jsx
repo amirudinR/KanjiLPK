@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import kosakataJft from './data/kosakata.js'
 import useProgress from './hooks/useProgress.js'
 import useTheme from './hooks/useTheme.js'
@@ -23,6 +23,13 @@ const TABS = [
 function App() {
   const [tab, setTab] = useState('belajar')
   const [index, setIndex] = useState(0)
+  const [focusMode, setFocusMode] = useState(() => {
+    try {
+      return localStorage.getItem('kanji-notebook:focus-mode') === '1'
+    } catch {
+      return false
+    }
+  })
   const total = kosakataJft.length
 
   const { theme, toggleTheme } = useTheme()
@@ -42,6 +49,38 @@ function App() {
   } = useProgress(total)
 
   const progressPercent = total ? Math.round((counts.known / total) * 100) : 0
+
+  const toggleFocus = useCallback(() => {
+    setFocusMode((v) => {
+      const next = !v
+      try {
+        localStorage.setItem('kanji-notebook:focus-mode', next ? '1' : '0')
+      } catch {
+        /* localStorage tak tersedia — abaikan */
+      }
+      return next
+    })
+  }, [])
+
+  // Tekan "f" untuk keluar/masuk mode fokus, Esc untuk keluar.
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return
+      if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault()
+        toggleFocus()
+      } else if (e.key === 'Escape' && focusMode) {
+        setFocusMode(false)
+        try {
+          localStorage.setItem('kanji-notebook:focus-mode', '0')
+        } catch {
+          /* abaikan */
+        }
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [toggleFocus, focusMode])
 
   const handlePrev = useCallback(() => setIndex((i) => Math.max(0, i - 1)), [])
   const handleNext = useCallback(
@@ -82,19 +121,48 @@ function App() {
           ))}
         </div>
 
-        <NotebookHeader
-          total={total}
-          progressPercent={progressPercent}
-          theme={theme}
-          onToggleTheme={toggleTheme}
-          font={font}
-          onSetFont={setFont}
-          fontOptions={fontOptions}
-        />
+        <button
+          type="button"
+          className="focus-toggle"
+          onClick={toggleFocus}
+          aria-pressed={focusMode}
+          title={focusMode ? 'Tampilkan header, tab, dan progres (F / Esc)' : 'Mode fokus: sembunyikan header, tab, dan progres (F)'}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            {focusMode ? (
+              <path d="M6 9l6 6 6-6" />
+            ) : (
+              <path d="M6 15l6-6 6 6" />
+            )}
+          </svg>
+          {focusMode ? 'Keluar Fokus' : 'Mode Fokus'}
+        </button>
 
-        <TabNav tabs={TABS} active={tab} onChange={setTab} />
+        <div className={`notebook-topbar ${focusMode ? 'is-hidden' : ''}`}>
+          <NotebookHeader
+            total={total}
+            progressPercent={progressPercent}
+            theme={theme}
+            onToggleTheme={toggleTheme}
+            font={font}
+            onSetFont={setFont}
+            fontOptions={fontOptions}
+          />
 
-        <ProgressStrip percent={progressPercent} note={statusNote} />
+          <TabNav tabs={TABS} active={tab} onChange={setTab} />
+
+          <ProgressStrip percent={progressPercent} note={statusNote} />
+        </div>
 
         <main className="notebook-body">
           {tab === 'belajar' && (

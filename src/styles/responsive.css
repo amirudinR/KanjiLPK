@@ -7,6 +7,16 @@
     padding: 20px 16px;
   }
 
+  /* Beri ruang tombol Fokus, tapi tidak selebar desktop. */
+  .notebook-head {
+    padding-right: 92px;
+  }
+
+  .focus-toggle {
+    font-size: 0.76rem;
+    padding: 5px 10px;
+  }
+
   .notebook-spiral {
     left: -22px;
     width: 22px;
