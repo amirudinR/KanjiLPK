@@ -12,9 +12,15 @@
     padding-right: 92px;
   }
 
-  .focus-toggle {
+  .focus-toggle,
+  .rotate-toggle {
     font-size: 0.76rem;
     padding: 5px 10px;
+  }
+
+  .rotate-toggle {
+    right: 118px;
+    display: inline-flex;
   }
 
   .notebook-spiral {
@@ -188,5 +194,189 @@
   .allwords-detail-jump {
     padding: 10px 14px;
     font-size: 0.95rem;
+  }
+}
+
+/* ==========================================================================
+   Mode landscape paksa (tab Hafalan di ponsel).
+   Konten diputar 90° sehingga tampil landscape walau HP dipegang tegak.
+   Hanya berlaku saat orientasi perangkat portrait; kalau HP sudah diputar
+   fisik ke landscape, tidak diputar lagi (menghindari dobel putar).
+   ========================================================================== */
+@media (max-width: 760px) and (orientation: portrait) {
+  body {
+    overflow: hidden;
+    height: 100dvh;
+  }
+
+  .app {
+    padding: 0;
+    height: 100dvh;
+    align-items: stretch;
+  }
+
+  /* Kotak buku diputar: lebar = tinggi viewport, tinggi = lebar viewport. */
+  .notebook.is-landscape {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100dvh;
+    height: 100vw;
+    margin-left: 0;
+    transform: rotate(90deg) translateY(-100%);
+    transform-origin: top left;
+    overflow-y: auto;
+    border-radius: 0;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Sembunyikan bagian atas agar lega; fokus ke kartu & kontrol. */
+  .notebook.is-landscape .notebook-topbar,
+  .notebook.is-landscape .notebook-spiral,
+  .notebook.is-landscape .focus-toggle {
+    display: none;
+  }
+
+  /* Tombol buka kunci harus tetap terlihat di dalam area terputar. */
+  .notebook.is-landscape .rotate-toggle {
+    right: 12px;
+    top: 10px;
+  }
+
+  /* Tata letak 3 kolom seperti desktop, tapi mengisi tinggi penuh. */
+  .notebook.is-landscape .notebook-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 34px 0 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .notebook.is-landscape .flashcard {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .notebook.is-landscape .flashcard-main {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 170px 240px;
+    grid-template-rows: minmax(0, 1fr);
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .notebook.is-landscape .flashcard-main > .flashcard-flip {
+    grid-column: 1;
+    grid-row: 1;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .notebook.is-landscape .flashcard-flip,
+  .notebook.is-landscape .flashcard-inner {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .notebook.is-landscape .flashcard-main > .flashcard-controls {
+    grid-column: 2;
+    grid-row: 1;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 8px;
+    padding-top: 0;
+    margin-top: 0;
+  }
+
+  .notebook.is-landscape .flashcard-main > .flashcard-aside {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .notebook.is-landscape .flashcard-btn {
+    width: 100%;
+    padding: 9px 10px;
+    font-size: 0.86rem;
+  }
+
+  .notebook.is-landscape .flashcard-sidebar {
+    margin-top: 0;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .notebook.is-landscape .flashcard-jump-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+    grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+    gap: 5px;
+    align-content: start;
+  }
+
+  .notebook.is-landscape .flashcard-kanji {
+    font-size: clamp(3rem, 16vh, 6rem);
+  }
+
+  .notebook.is-landscape .notebook-foot {
+    display: none;
+  }
+
+  /* Saat panel di kiri, balik urutan kolomnya. */
+  .notebook.is-landscape
+    .flashcard-main.is-aside-left {
+    grid-template-columns: 240px 170px minmax(0, 1fr);
+  }
+
+  .notebook.is-landscape
+    .flashcard-main.is-aside-left
+    > .flashcard-aside {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .notebook.is-landscape
+    .flashcard-main.is-aside-left
+    > .flashcard-flip {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  /* Kartu ditutup: sembunyikan kartu, kontrol & jumplist melebar. */
+  .notebook.is-landscape
+    .flashcard-main.is-card-collapsed {
+    grid-template-columns: 170px minmax(0, 1fr);
+  }
+
+  .notebook.is-landscape
+    .flashcard-main.is-card-collapsed
+    > .flashcard-flip {
+    display: none;
+  }
+
+  .notebook.is-landscape
+    .flashcard-main.is-card-collapsed
+    > .flashcard-controls {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .notebook.is-landscape
+    .flashcard-main.is-card-collapsed
+    > .flashcard-aside {
+    grid-column: 2;
+    grid-row: 1;
   }
 }

@@ -31,10 +31,10 @@
 }
 
 /* Tombol Mode Fokus — mengambang di sudut kanan atas buku */
-.focus-toggle {
+.focus-toggle,
+.rotate-toggle {
   position: absolute;
   top: 10px;
-  right: 12px;
   z-index: 5;
   display: inline-flex;
   align-items: center;
@@ -54,13 +54,25 @@
     background 140ms ease;
 }
 
-.focus-toggle:hover {
+.focus-toggle {
+  right: 12px;
+}
+
+.rotate-toggle {
+  right: 148px;
+  /* Tombol kunci putar hanya relevan di ponsel. */
+  display: none;
+}
+
+.focus-toggle:hover,
+.rotate-toggle:hover {
   color: var(--accent-deep);
   border-color: var(--accent);
   transform: translateY(-1px);
 }
 
-.focus-toggle[aria-pressed='true'] {
+.focus-toggle[aria-pressed='true'],
+.rotate-toggle[aria-pressed='true'] {
   color: var(--accent-deep);
   background: var(--accent-soft);
   border-color: var(--accent);

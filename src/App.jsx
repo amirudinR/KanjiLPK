@@ -30,6 +30,14 @@ function App() {
       return false
     }
   })
+  // Kunci tampilan landscape (diputar 90°) khusus tab Hafalan di ponsel.
+  const [rotateLocked, setRotateLocked] = useState(() => {
+    try {
+      return localStorage.getItem('kanji-notebook:rotate-locked') === '1'
+    } catch {
+      return false
+    }
+  })
   const total = kosakataJft.length
 
   const { theme, toggleTheme } = useTheme()
@@ -61,6 +69,21 @@ function App() {
       return next
     })
   }, [])
+
+  const toggleRotateLock = useCallback(() => {
+    setRotateLocked((v) => {
+      const next = !v
+      try {
+        localStorage.setItem('kanji-notebook:rotate-locked', next ? '1' : '0')
+      } catch {
+        /* localStorage tak tersedia — abaikan */
+      }
+      return next
+    })
+  }, [])
+
+  // Rotasi terkunci hanya berlaku di tab Hafalan.
+  const landscapeActive = rotateLocked && tab === 'belajar'
 
   // Tekan "f" untuk keluar/masuk mode fokus, Esc untuk keluar.
   useEffect(() => {
@@ -114,7 +137,9 @@ function App() {
 
   return (
     <div className="app">
-      <div className={`notebook ${focusMode ? 'is-focus' : ''}`}>
+      <div
+        className={`notebook ${focusMode ? 'is-focus' : ''} ${landscapeActive ? 'is-landscape' : ''}`}
+      >
         <div className="notebook-spiral" aria-hidden="true">
           {Array.from({ length: 14 }).map((_, i) => (
             <span key={i} className="notebook-ring" />
@@ -146,6 +171,43 @@ function App() {
             )}
           </svg>
           {focusMode ? 'Keluar Fokus' : 'Mode Fokus'}
+        </button>
+
+        <button
+          type="button"
+          className="rotate-toggle"
+          onClick={toggleRotateLock}
+          aria-pressed={rotateLocked}
+          title={
+            rotateLocked
+              ? 'Buka kunci putar (kembali ke tampilan tegak)'
+              : 'Kunci tampilan landscape (diputar) untuk mode Hafalan'
+          }
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            {rotateLocked ? (
+              <>
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path d="M8 11V7a4 4 0 0 1 7.5-2" />
+              </>
+            ) : (
+              <>
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+              </>
+            )}
+          </svg>
+          {rotateLocked ? 'Buka Kunci' : 'Kunci Putar'}
         </button>
 
         <div className={`notebook-topbar ${focusMode ? 'is-hidden' : ''}`}>
