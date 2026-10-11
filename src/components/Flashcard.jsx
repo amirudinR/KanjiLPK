@@ -20,7 +20,6 @@ function Flashcard({
 }) {
   const [flipped, setFlipped] = useState(false)
   const [slideDir, setSlideDir] = useState(0)
-  const [lastIndex, setLastIndex] = useState(index)
   const [asideSide, setAsideSide] = useState(() => {
     try {
       return localStorage.getItem('kanji-notebook:aside-side') === 'left'
@@ -66,12 +65,9 @@ function Flashcard({
   const safeIndex = total > 0 ? Math.min(Math.max(index, 0), total - 1) : 0
   const item = total > 0 ? items[safeIndex] : null
 
-  if (lastIndex !== safeIndex) {
-    setSlideDir(safeIndex > lastIndex ? 1 : -1)
-    setLastIndex(safeIndex)
-    setFlipped(false)
-  }
-
+  // Reset status balik dilakukan pada event navigasi (lihat handlePrev/
+  // handleNext/handleJump), bukan lewat effect, sehingga tidak ada setState
+  // di dalam render maupun effect.
   useEffect(() => {
     if (flipped) {
       flipButtonRef.current?.focus?.({ preventScroll: true })
@@ -83,12 +79,30 @@ function Flashcard({
   }, [])
 
   const handlePrev = useCallback(() => {
-    if (safeIndex > 0) onPrev?.()
+    if (safeIndex > 0) {
+      setSlideDir(-1)
+      setFlipped(false)
+      onPrev?.()
+    }
   }, [safeIndex, onPrev])
 
   const handleNext = useCallback(() => {
-    if (safeIndex < total - 1) onNext?.()
+    if (safeIndex < total - 1) {
+      setSlideDir(1)
+      setFlipped(false)
+      onNext?.()
+    }
   }, [safeIndex, total, onNext])
+
+  const handleJump = useCallback(
+    (i) => {
+      if (i === safeIndex) return
+      setSlideDir(i > safeIndex ? 1 : -1)
+      setFlipped(false)
+      onJump?.(i)
+    },
+    [safeIndex, onJump],
+  )
 
   useEffect(() => {
     const onKeyDown = (e) => {
@@ -297,7 +311,7 @@ function Flashcard({
             items={items}
             safeIndex={safeIndex}
             statusFor={statusFor}
-            onJump={onJump}
+            onJump={handleJump}
           />
         </div>
       </div>

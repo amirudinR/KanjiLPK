@@ -16,7 +16,11 @@ function FlashcardBack({
   const [showRelated, setShowRelated] = useState(false)
 
   return (
-    <div className="flashcard-face flashcard-back" aria-hidden={!flipped}>
+    <div
+      className="flashcard-face flashcard-back"
+      aria-hidden={!flipped}
+      inert={!flipped ? '' : undefined}
+    >
       <div className="flashcard-back-head">
         <span className="flashcard-back-kanji" lang="ja">
           {item.kata}
@@ -59,7 +63,9 @@ function FlashcardBack({
               onClick={() => setShowKanji((v) => !v)}
               aria-expanded={showKanji}
             >
-              <dt>Kanji ({kanjiInfoList.length})</dt>
+              <span className="flashcard-collapsible-label">
+                Kanji ({kanjiInfoList.length})
+              </span>
               <span className="flashcard-collapsible-icon" aria-hidden="true">
                 {showKanji ? '−' : '+'}
               </span>
@@ -113,7 +119,9 @@ function FlashcardBack({
             onClick={() => setShowRelated((v) => !v)}
             aria-expanded={showRelated}
           >
-            <dt>Contoh ({related.length})</dt>
+            <span className="flashcard-collapsible-label">
+              Contoh ({related.length})
+            </span>
             <span className="flashcard-collapsible-icon" aria-hidden="true">
               {showRelated ? '−' : '+'}
             </span>

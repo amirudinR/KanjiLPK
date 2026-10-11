@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Icon from './Icon.jsx'
 
 function Stat({ value, label, tone, sub, icon }) {
@@ -20,16 +20,29 @@ function Dashboard({ counts, total, onContinue, onReset, streak, onExport, onImp
   const [confirming, setConfirming] = useState(false)
   const [importMessage, setImportMessage] = useState('')
   const fileInputRef = useRef(null)
+  const resetTimerRef = useRef(null)
+  const importTimerRef = useRef(null)
   const pct = total > 0 ? Math.round((counts.known / total) * 100) : 0
   const remaining = total - counts.known
+
+  // Bersihkan semua timer saat komponen dilepas agar tidak setState
+  // pada komponen yang sudah unmount.
+  useEffect(() => {
+    return () => {
+      clearTimeout(resetTimerRef.current)
+      clearTimeout(importTimerRef.current)
+    }
+  }, [])
 
   const handleReset = () => {
     if (confirming) {
       onReset()
       setConfirming(false)
+      clearTimeout(resetTimerRef.current)
     } else {
       setConfirming(true)
-      setTimeout(() => setConfirming(false), 3000)
+      clearTimeout(resetTimerRef.current)
+      resetTimerRef.current = setTimeout(() => setConfirming(false), 3000)
     }
   }
 
@@ -40,7 +53,8 @@ function Dashboard({ counts, total, onContinue, onReset, streak, onExport, onImp
     reader.onload = (ev) => {
       const result = onImport(ev.target?.result)
       setImportMessage(result ? 'Progres berhasil diimpor!' : 'Gagal mengimpor file.')
-      setTimeout(() => setImportMessage(''), 3000)
+      clearTimeout(importTimerRef.current)
+      importTimerRef.current = setTimeout(() => setImportMessage(''), 3000)
     }
     reader.readAsText(file)
     e.target.value = ''

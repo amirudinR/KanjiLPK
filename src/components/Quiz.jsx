@@ -20,17 +20,6 @@ function Quiz({
   const [answeredCount, setAnsweredCount] = useState(0)
   const [score, setScore] = useState(0)
   const [announcement, setAnnouncement] = useState('')
-  const [sessionItems, setSessionItems] = useState(items)
-
-  if (items !== sessionItems) {
-    setSessionItems(items)
-    setSession(buildSession(items, SESSION_SIZE))
-    setIndex(0)
-    setSelected(null)
-    setAnsweredCount(0)
-    setScore(0)
-    setAnnouncement('')
-  }
 
   const current = session[index] ?? null
   const isFinished = session.length > 0 && index >= session.length

@@ -299,6 +299,13 @@
   .notebook.is-landscape .flashcard-main > .flashcard-aside {
     grid-column: 3;
     grid-row: 1;
+    /* Base rule `.flashcard-aside { display: contents }` tidak match blok
+       desktop di sini, jadi harus di-set ulang agar wrapper jadi grid item. */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    min-height: 0;
   }
 
   .notebook.is-landscape .flashcard-btn {

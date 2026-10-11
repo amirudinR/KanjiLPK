@@ -44,14 +44,23 @@ function readStoredStreak() {
   }
 }
 
+function getLocalDateStr(date = new Date()) {
+  // YYYY-MM-DD berdasarkan waktu LOKAL (bukan UTC) supaya pergantian hari
+  // sesuai jam pengguna, bukan jam UTC.
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
 function getTodayStr() {
-  return new Date().toISOString().slice(0, 10)
+  return getLocalDateStr()
 }
 
 function getYesterdayStr() {
   const d = new Date()
   d.setDate(d.getDate() - 1)
-  return d.toISOString().slice(0, 10)
+  return getLocalDateStr(d)
 }
 
 export function useProgress(totalItems = 0) {
@@ -67,22 +76,23 @@ export function useProgress(totalItems = 0) {
     }
   }, [progress])
 
-  const today = getTodayStr()
-  const yesterday = getYesterdayStr()
-  const needsStreakUpdate =
-    typeof window !== 'undefined' &&
-    window.localStorage &&
-    streak.lastDate !== today
-  if (needsStreakUpdate) {
-    const newCount = streak.lastDate === yesterday ? streak.count + 1 : 1
-    const newStreak = { count: newCount, lastDate: today }
+  // Perbarui streak sekali per hari. Dijalankan di effect (bukan saat render)
+  // supaya tidak menulis localStorage / setState di tengah render.
+  useEffect(() => {
     try {
+      if (typeof window === 'undefined' || !window.localStorage) return
+      const today = getTodayStr()
+      if (streak.lastDate === today) return
+      const newCount = streak.lastDate === getYesterdayStr() ? streak.count + 1 : 1
+      const newStreak = { count: newCount, lastDate: today }
       window.localStorage.setItem(STREAK_KEY, JSON.stringify(newStreak))
+      setStreak(newStreak)
     } catch {
       // ignore
     }
-    setStreak(newStreak)
-  }
+    // streak sengaja tidak dijadikan dependency: hanya perlu dicek saat mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const statusFor = useCallback(
     (id) => {

@@ -3,10 +3,41 @@ import Icon from './Icon.jsx'
 import { kanjiDetails, relatedWords } from '../utils/kanjiDetail.js'
 
 function AllWords({ items, statusFor, onJumpToCard }) {
-  const [view, setView] = useState('grid')
+  const [view, setView] = useState(() => {
+    try {
+      const v = localStorage.getItem('kanji-notebook:allwords-view')
+      return v === 'list' ? 'list' : 'grid'
+    } catch {
+      return 'grid'
+    }
+  })
   const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState('all')
+  const [filter, setFilter] = useState(() => {
+    try {
+      const f = localStorage.getItem('kanji-notebook:allwords-filter')
+      return ['all', 'known', 'learning', 'new'].includes(f) ? f : 'all'
+    } catch {
+      return 'all'
+    }
+  })
   const [expandedId, setExpandedId] = useState(null)
+
+  // Simpan preferensi tampilan & filter agar bertahan setelah refresh.
+  useEffect(() => {
+    try {
+      localStorage.setItem('kanji-notebook:allwords-view', view)
+    } catch {
+      /* abaikan */
+    }
+  }, [view])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('kanji-notebook:allwords-filter', filter)
+    } catch {
+      /* abaikan */
+    }
+  }, [filter])
 
   const filteredItems = useMemo(() => {
     const q = search.trim().toLowerCase()

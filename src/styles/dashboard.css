@@ -226,6 +226,21 @@
   border-color: var(--danger);
 }
 
+/* Tombol "ghost": latar transparan, hanya garis tepi. */
+.btn-ghost {
+  background: transparent;
+  color: var(--accent-deep);
+  border-color: var(--paper-edge);
+  box-shadow: none;
+}
+
+.btn-ghost:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  transform: translateY(-2px);
+  box-shadow: none;
+}
+
 .btn-danger-confirm {
   background: var(--danger);
   color: #fff;

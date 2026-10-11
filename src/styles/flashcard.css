@@ -59,9 +59,6 @@
 /* Hint keyboard & tombol panel didorong ke kanan. */
 .flashcard-keyboard-hint {
   margin-left: auto;
-}
-
-.flashcard-keyboard-hint {
   font-family: var(--font-note);
   font-size: 0.82rem;
   color: var(--ink-faint);
@@ -264,7 +261,7 @@
   border-color: var(--accent);
 }
 
-.flashcard-collapsible-toggle dt {
+.flashcard-collapsible-toggle .flashcard-collapsible-label {
   font-family: var(--font-hand);
   font-size: 1.15rem;
   color: var(--ink);

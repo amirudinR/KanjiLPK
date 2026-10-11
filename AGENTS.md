@@ -8,7 +8,7 @@ Panduan untuk AI agent (atau developer) yang mengerjakan proyek ini.
 | --- | --- |
 | Nama paket | `kanji-hafalan` (private, `version` 1.0.0) |
 | Fungsi | Hafalan kanji/kosakata JFT berurutan (613 entri) |
-| Tech stack | React 18 + Vite 8, JavaScript (bukan TypeScript) |
+| Tech stack | React 19 + Vite 8, JavaScript (bukan TypeScript) |
 | Styling | CSS modular (`src/styles/`) — bukan Tailwind |
 | Data | `src/data/kosakata.js` (613 entri) + `src/data/kanjiDict.js` (490 kanji) |
 | Target deploy | Static site di Vercel |

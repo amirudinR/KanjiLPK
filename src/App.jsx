@@ -21,8 +21,24 @@ const TABS = [
 ]
 
 function App() {
-  const [tab, setTab] = useState('belajar')
-  const [index, setIndex] = useState(0)
+  const [tab, setTab] = useState(() => {
+    try {
+      const saved = localStorage.getItem('kanji-notebook:active-tab')
+      return ['belajar', 'kuis', 'semua', 'progres'].includes(saved)
+        ? saved
+        : 'belajar'
+    } catch {
+      return 'belajar'
+    }
+  })
+  const [index, setIndex] = useState(() => {
+    try {
+      const saved = Number(localStorage.getItem('kanji-notebook:card-index'))
+      return Number.isInteger(saved) && saved >= 0 ? saved : 0
+    } catch {
+      return 0
+    }
+  })
   const [focusMode, setFocusMode] = useState(() => {
     try {
       return localStorage.getItem('kanji-notebook:focus-mode') === '1'
@@ -85,6 +101,23 @@ function App() {
   // Rotasi terkunci hanya berlaku di tab Hafalan.
   const landscapeActive = rotateLocked && tab === 'belajar'
 
+  // Simpan tab aktif & nomor kartu terakhir agar tidak balik ke awal saat refresh.
+  useEffect(() => {
+    try {
+      localStorage.setItem('kanji-notebook:active-tab', tab)
+    } catch {
+      /* abaikan */
+    }
+  }, [tab])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('kanji-notebook:card-index', String(index))
+    } catch {
+      /* abaikan */
+    }
+  }, [index])
+
   // Tekan "f" untuk keluar/masuk mode fokus, Esc untuk keluar.
   useEffect(() => {
     const onKey = (e) => {
@@ -112,14 +145,10 @@ function App() {
   )
   const handleJump = useCallback((i) => setIndex(i), [])
 
+  // Konfirmasi sudah ditangani Dashboard (klik dua kali), jadi tidak perlu
+  // dialog window.confirm tambahan.
   const handleReset = useCallback(() => {
-    if (
-      window.confirm(
-        'Hapus semua progres hafalan? Tindakan ini tidak bisa dibatalkan.',
-      )
-    ) {
-      resetAll()
-    }
+    resetAll()
   }, [resetAll])
 
   const tabTitle = useMemo(

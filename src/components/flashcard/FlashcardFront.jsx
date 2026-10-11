@@ -18,7 +18,11 @@ function FlashcardFront({
   hasJapaneseVoice,
 }) {
   return (
-    <div className="flashcard-face flashcard-front" aria-hidden={flipped}>
+    <div
+      className="flashcard-face flashcard-front"
+      aria-hidden={flipped}
+      inert={flipped ? '' : undefined}
+    >
       <span className="flashcard-kanji" lang="ja">
         {kata}
       </span>
