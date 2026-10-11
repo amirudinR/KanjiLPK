@@ -2,6 +2,30 @@
    Tata letak — kerangka buku catatan, kepala, tab, strip progres, kaki
    ========================================================================== */
 
+/* Matikan highlight tap bawaan (Chrome Android menampilkan kilatan
+   abu-abu/biru saat elemen disentuh). Tanpa ini, kartu yang bisa dibalik
+   (dan tombol lain) tampak "berkedip" tepat saat ditekan. */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Kartu bisa dibalik diberi role="button" + tabIndex agar bisa diakses
+   keyboard. Di Android Chrome, fokus sentuh pada elemen seperti itu memicu
+   outline/ring bawaan yang juga terasa seperti kedipan — matikan khusus
+   untuk elemen ini sambil tetap mempertahankan ring fokus keyboard. */
+.flashcard-flip {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Ring fokus tetap muncul untuk navigasi keyboard (bukan sentuh). */
+.flashcard-flip:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 16px;
+}
+
 /* Teks hanya untuk screen reader */
 .sr-only {
   position: absolute;
