@@ -114,7 +114,7 @@ function App() {
 
   return (
     <div className="app">
-      <div className="notebook">
+      <div className={`notebook ${focusMode ? 'is-focus' : ''}`}>
         <div className="notebook-spiral" aria-hidden="true">
           {Array.from({ length: 14 }).map((_, i) => (
             <span key={i} className="notebook-ring" />

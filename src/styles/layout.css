@@ -393,6 +393,12 @@
   padding: 6px 0 10px;
 }
 
+/* Mode fokus: header/tab/progres disembunyikan, jadi beri ruang atas
+   agar konten tidak tertimpa tombol "Keluar Fokus" di sudut kanan. */
+.notebook.is-focus .notebook-body {
+  padding-top: 40px;
+}
+
 /* --- Kaki buku --- */
 .notebook-foot {
   display: flex;
@@ -510,6 +516,11 @@
     flex-direction: column;
     overflow-y: auto;
     overflow-x: hidden;
+  }
+
+  /* Mode fokus di desktop: sisakan ruang atas untuk tombol "Keluar Fokus". */
+  .notebook.is-focus .notebook-body {
+    padding-top: 38px;
   }
 
   .notebook-body > .flashcard {
