@@ -82,6 +82,88 @@ Pembersihan manual (satu kali per browser yang terpengaruh):
 - **Dark Mode** — Toggle terang/gelap dengan transisi halus.
 - **Responsive** — Layout adaptif untuk desktop dan mobile.
 
+## Flashcard — catatan penting (JANGAN dikembalikan)
+
+Tiga perbaikan pernah dilakukan pada kartu hafalan. Semuanya sengaja dipasang
+untuk mengatasi keluhan/masalah nyata di perangkat mobile. **Jangan mengubah
+balik** ke pola lama tanpa alasan kuat.
+
+### 1. Tombol kontrol di mode landscape paksa — jangan biarkan melar
+
+Mode landscape paksa aktif saat HP **portrait** (`@media (max-width: 760px)
+and (orientation: portrait)` di `responsive.css`): notebook dirotasi 90° dan
+`.flashcard-main` jadi grid **3 kolom** — kartu | kontrol (**132px**) | Lompat
+Cepat (168px).
+
+Masalah lama: di HP ≤460px, `@media (max-width: 460px)` mengubah
+`.flashcard-controls` jadi **grid 2 kolom** dan memberi `.flashcard-btn-flip`
+`grid-column: 1 / -1` + `order: -1`. Karena aturan landscape **tidak** meng-set
+`display`, grid dari aturan ≤460px tetap menang → tombol "Balik Kartu"
+membentang melebihi kolom 132px dan **menimpa tombol lain** (tampak terjepit).
+
+Perbaikan (di blok landscape `responsive.css`):
+- `.flashcard-controls` di-set ulang `display: flex; flex-direction: column`
+  (menimpa grid dari aturan ≤460px), plus `min-width: 0; max-width: 100%;
+  align-items: stretch`.
+- `.flashcard-btn-flip` direset `grid-column: auto; order: 0`.
+- Setiap `.flashcard-btn` dalam kontrol: `flex: 1 1 0; min-width: 0; max-width:
+  100%; white-space: normal; overflow-wrap: anywhere; line-height: 1.15`.
+
+Kalau mengubah aturan landscape atau aturan `max-width: 460px`, **pastikan dua
+media query ini tidak bentrok lagi** — grid vs flex pada `.flashcard-controls`.
+
+### 2. Kedipan 3D saat kartu dibalik (WebKit)
+
+Gejala: saat kartu diputar, isi/garis kartu berkedip (khususnya Safari/WebKit).
+
+Perbaikan (`flashcard.css`):
+- `.flashcard-face`: `overflow` **`hidden`** (bukan `auto`). `overflow: auto`
+  memaksa WebKit me-repaint isi tiap frame saat elemen berputar 3D → kedip.
+- `.flashcard-inner`: tambah `will-change: transform` +
+  `backface-visibility: hidden` supaya sisi belakang siap sebelum animasi.
+- `.flashcard-back`: `overflow-y: auto` + `overscroll-behavior: contain` untuk
+  scroll internal tanpa memicu repaint wrapper 3D.
+
+**Jangan** mengubah `.flashcard-face` kembali ke `overflow: auto`, dan jangan
+tambahkan `transform` (mis. `translateZ(0)`) pada `.flashcard-face` — itu bisa
+menimpa `transform: rotateY(180deg)` milik `.flashcard-back` (spesifisitas sama,
+yang terakhir menang) dan merusak sisi belakang.
+
+### 3. Kedipan saat kartu disentuh (Chrome Android) — tap highlight
+
+Gejala: tepat saat kartu **ditekan/disentuh**, ada kilatan seperti kedip.
+Penyebabnya bukan animasi, tapi **default Chrome Android**: `.flashcard-flip`
+punya `role="button"` + `tabIndex={0}` (agar bisa di-Enter), sehingga Chrome
+menampilkan `-webkit-tap-highlight-color` dan ring fokus bawaan saat disentuh.
+
+Perbaikan (`layout.css`, bagian paling atas):
+- `* { -webkit-tap-highlight-color: transparent; }` (global, satu kali).
+- `.flashcard-flip { outline: none; -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; }`.
+- Ring fokus tetap ada lewat `.flashcard-flip:focus-visible { outline: 3px
+  solid var(--accent); }` — hanya untuk **keyboard**, bukan sentuh.
+
+**Jangan** hapus aturan ini "demi aksesibilitas" — `:focus-visible` sudah
+menggantikan ring untuk keyboard. Menghapusnya akan menghidupkan lagi kedipan
+tap di Android.
+
+### 4. `focus()` ke tombol flip — hanya untuk keyboard/mouse
+
+`Flashcard.jsx` memfokuskan tombol flip setiap kali `flipped` berubah, **tetapi
+dengan guard**: kalau `matchMedia('(pointer: coarse)')` true (perangkat sentuh),
+fokus dilewati. Di HP, memfokuskan tombol memicu scroll + ring fokus yang
+tampak seperti kedipan. Jangan hapus guard ini; kehilangan fokus keyboard di
+desktop justru regresi aksesibilitas kecil, sedangkan tanpa guard = kedip di HP.
+
+### Regresi yang HARUS diuji ulang setelah menyentuh flashcard
+
+Setelah mengubah `flashcard.css`, `responsive.css`, atau `Flashcard.jsx`, uji:
+1. **Desktop** (≥761px): kartu tetap bisa dibalik, ring fokus keyboard muncul.
+2. **HP portrait** (≤460px, landscape paksa): tombol kontrol sejajar, tidak ada
+   yang terjepit/menimpa; kartu bisa dibalik; **tidak ada kedip** saat disentuh.
+3. **HP landscape fisik**: layout 3 kolom normal tetap jalan.
+4. `npm run build` + `npm run lint` bersih.
+
 ## Menjalankan
 
 ```bash
@@ -97,11 +179,15 @@ Auto-deploy GitHub **tidak** aktif untuk proyek ini. Deploy manual dari folder
 ini setelah setiap perubahan:
 
 ```bash
-npx vercel --prod
+git add -A && git commit -m "..."   # commit ke GitHub (repo KanjiLPK)
+git push origin main                # push ke GitHub
+npx vercel --prod                   # deploy ke produksi
 ```
 
 Jika domain `kanjilpk.vercel.app` tidak menampilkan versi terbaru, cek & hapus
-alias lama (lihat bagian "PENTING — domain nyangkut" di atas).
+alias lama (lihat bagian "PENTING — domain nyangkut" di atas). Setelah deploy,
+pesan `Aliased: https://kanjilpk.vercel.app` menandakan domain sudah mengarah
+ke deployment baru (tidak nyangkut).
 
 ## Struktur
 
