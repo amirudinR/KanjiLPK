@@ -187,6 +187,19 @@ Setelah mengubah `flashcard.css`, `responsive.css`, atau `Flashcard.jsx`, uji:
 3. **HP landscape fisik**: layout 3 kolom normal tetap jalan.
 4. `npm run build` + `npm run lint` bersih.
 
+### Riwayat perubahan flashcard (catatan anti-bentrok)
+
+Tabel ini melacak perubahan yang sudah dilakukan agar tidak ada yang mengulang
+atau menimpanya tanpa sengaja. Perbarui tabel ini setiap menyentuh flashcard.
+
+| # | File | Perubahan | Alasan | Status |
+| --- | --- | --- | --- | --- |
+| 1 | `responsive.css` | Reset `.flashcard-controls` jadi flex column + reset `grid-column`/`order` tombol flip di blok landscape | Tombol "Balik Kartu" menimpa tombol lain di HP ≤460px | ada |
+| 2 | `flashcard.css` | `.flashcard-face` `overflow: hidden`; `.flashcard-inner` `will-change`+`backface-visibility`; `.flashcard-back` `overflow-y: auto` + `overscroll-behavior: contain` | Kedip 3D di WebKit | ada |
+| 3 | `layout.css` | `* { -webkit-tap-highlight-color: transparent }`; `.flashcard-flip` outline/tap-highlight/touch-action; ring `:focus-visible` | Kedip saat disentuh di Chrome Android | ada |
+| 4 | `Flashcard.jsx` | `focus()` ke tombol flip dengan guard `pointer: coarse` | Fokus di HP memicu kedip | ada |
+| 5 | `Flashcard.jsx`, `flashcard.css` | Guard drag `pointerStartRef` (tolak flip bila delta >10px) + scrollbar `.flashcard-back` dipertegas | Isi kartu sisi belakang tidak bisa di-scroll; tiap scroll kartu terbalik | ada |
+
 ## Menjalankan
 
 ```bash
@@ -211,6 +224,24 @@ Jika domain `kanjilpk.vercel.app` tidak menampilkan versi terbaru, cek & hapus
 alias lama (lihat bagian "PENTING — domain nyangkut" di atas). Setelah deploy,
 pesan `Aliased: https://kanjilpk.vercel.app` menandakan domain sudah mengarah
 ke deployment baru (tidak nyangkut).
+
+### Status deploy terakhir
+
+| Item | Nilai |
+| --- | --- |
+| Commit terakhir yang di-push | `c928cbd` — "Buat isi kartu sisi belakang bisa di-scroll tanpa keburu terbalik" (14 Okt 2026) |
+| File dalam commit itu | `AGENTS.md`, `src/components/Flashcard.jsx`, `src/styles/flashcard.css` |
+| Status push ke `origin/main` | ✅ sudah (`03981a4..c928cbd`) |
+| Status `npx vercel --prod` | ⏳ **belum dijalankan** — jalankan untuk menerbitkan perbaikan scroll ke `kanjilpk.vercel.app` |
+
+> **Aturan anti-bentrok proyek ini:**
+> - Proyek Kanji **hanya** di `D:\LPK\KanjiLPK-asli` (repo `KanjiLPK`, domain
+>   `kanjilpk.vercel.app`). **Jangan** menyentuh `D:\LPK\kanji-hafalan` — itu
+>   proyek Kotoba (repo `kotoba50bab`). Nama folder menyesatkan.
+> - Sebelum mengubah flashcard, baca tabel "Riwayat perubahan flashcard" di atas
+>   agar tidak menimpa perbaikan yang sudah ada.
+> - Setelah setiap perubahan: `npm run lint` + `npm run build` **wajib** lolos,
+>   lalu commit → push → `npx vercel --prod`, dan perbarui "Status deploy terakhir".
 
 ## Struktur
 
