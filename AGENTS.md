@@ -239,10 +239,10 @@ ke deployment baru (tidak nyangkut).
 
 | Item | Nilai |
 | --- | --- |
-| Commit terakhir yang di-push | `42d6992` — "Catat riwayat perubahan flashcard & status deploy di AGENTS.md" (14 Okt 2026). Sebelumnya: `c928cbd` — "Buat isi kartu sisi belakang bisa di-scroll…" |
-| File dalam commit itu | `AGENTS.md`, `src/components/Flashcard.jsx`, `src/styles/flashcard.css` |
-| Status push ke `origin/main` | ✅ sudah (`c928cbd..42d6992`) |
-| Status `npx vercel --prod` | ✅ sudah (14 Okt 2026) — deployment `kanjilpk-cayivnx3x…`, `readyState: READY`, domain `kanjilpk.vercel.app` mengarah ke versi baru (title "Kanji Notebook", HTTP 200) |
+| Commit terakhir yang di-push | `1c29ee4` — "Perbaiki warning inert React 19 di sisi kartu flashcard" (14 Okt 2026). Sebelumnya: `c928cbd` (scroll kartu), `42d6992` (catatan) |
+| File yang diubah | `src/components/Flashcard.jsx`, `src/styles/flashcard.css`, `src/components/flashcard/FlashcardFront.jsx`, `src/components/flashcard/FlashcardBack.jsx`, `AGENTS.md` |
+| Status push ke `origin/main` | ✅ sudah (`42d6992..1c29ee4`) |
+| Status `npx vercel --prod` | ✅ sudah (14 Okt 2026) — deployment `kanjilpk-a1rdcjm89…`, `readyState: READY`, `Aliased: https://kanjilpk.vercel.app` |
 
 > **Aturan anti-bentrok proyek ini:**
 > - Proyek Kanji **hanya** di `D:\LPK\KanjiLPK-asli` (repo `KanjiLPK`, domain
