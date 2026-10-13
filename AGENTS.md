@@ -178,6 +178,15 @@ Perbaikan yang sudah dipasang:
 kembali membalik kartu. Jangan ubah `overflow: hidden` pada `.flashcard-face`
 (lihat poin 2) — scroll tetap ditangani `.flashcard-back` yang `overflow-y: auto`.
 
+### 6. `inert` harus boolean `true`, bukan string kosong (React 19)
+
+`FlashcardFront.jsx` & `FlashcardBack.jsx` menyembunyikan sisi kartu yang tidak
+aktif dengan `inert`. Di React 19, `inert={flipped ? '' : undefined}` memicu
+peringatan console berulang: *"Received an empty string for a boolean attribute
+`inert`"*. Perbaikan: pakai `inert={flipped ? true : undefined}`. **Jangan**
+kembalikan ke `''` — React 19 memperlakukannya sebagai false + warning tiap
+render.
+
 ### Regresi yang HARUS diuji ulang setelah menyentuh flashcard
 
 Setelah mengubah `flashcard.css`, `responsive.css`, atau `Flashcard.jsx`, uji:
@@ -199,6 +208,7 @@ atau menimpanya tanpa sengaja. Perbarui tabel ini setiap menyentuh flashcard.
 | 3 | `layout.css` | `* { -webkit-tap-highlight-color: transparent }`; `.flashcard-flip` outline/tap-highlight/touch-action; ring `:focus-visible` | Kedip saat disentuh di Chrome Android | ada |
 | 4 | `Flashcard.jsx` | `focus()` ke tombol flip dengan guard `pointer: coarse` | Fokus di HP memicu kedip | ada |
 | 5 | `Flashcard.jsx`, `flashcard.css` | Guard drag `pointerStartRef` (tolak flip bila delta >10px) + scrollbar `.flashcard-back` dipertegas | Isi kartu sisi belakang tidak bisa di-scroll; tiap scroll kartu terbalik | ada |
+| 6 | `FlashcardFront.jsx`, `FlashcardBack.jsx` | `inert={flipped ? true : undefined}` (dulu `''`) | React 19 memperingatkan "empty string for a boolean attribute `inert`" di console | ada |
 
 ## Menjalankan
 
@@ -229,10 +239,10 @@ ke deployment baru (tidak nyangkut).
 
 | Item | Nilai |
 | --- | --- |
-| Commit terakhir yang di-push | `c928cbd` — "Buat isi kartu sisi belakang bisa di-scroll tanpa keburu terbalik" (14 Okt 2026) |
+| Commit terakhir yang di-push | `42d6992` — "Catat riwayat perubahan flashcard & status deploy di AGENTS.md" (14 Okt 2026). Sebelumnya: `c928cbd` — "Buat isi kartu sisi belakang bisa di-scroll…" |
 | File dalam commit itu | `AGENTS.md`, `src/components/Flashcard.jsx`, `src/styles/flashcard.css` |
-| Status push ke `origin/main` | ✅ sudah (`03981a4..c928cbd`) |
-| Status `npx vercel --prod` | ⏳ **belum dijalankan** — jalankan untuk menerbitkan perbaikan scroll ke `kanjilpk.vercel.app` |
+| Status push ke `origin/main` | ✅ sudah (`c928cbd..42d6992`) |
+| Status `npx vercel --prod` | ✅ sudah (14 Okt 2026) — deployment `kanjilpk-cayivnx3x…`, `readyState: READY`, domain `kanjilpk.vercel.app` mengarah ke versi baru (title "Kanji Notebook", HTTP 200) |
 
 > **Aturan anti-bentrok proyek ini:**
 > - Proyek Kanji **hanya** di `D:\LPK\KanjiLPK-asli` (repo `KanjiLPK`, domain

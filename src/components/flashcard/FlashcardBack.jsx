@@ -19,7 +19,7 @@ function FlashcardBack({
     <div
       className="flashcard-face flashcard-back"
       aria-hidden={!flipped}
-      inert={!flipped ? '' : undefined}
+      inert={!flipped ? true : undefined}
     >
       <div className="flashcard-back-head">
         <span className="flashcard-back-kanji" lang="ja">
