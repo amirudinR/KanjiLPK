@@ -155,6 +155,27 @@
 .flashcard-back {
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* Scrollbar dibuat selalu terlihat & lebih tebal supaya jelas bahwa isi
+     kartu bisa digulir (sebelumnya tipis/auto-hide sehingga terkesan tidak
+     bisa di-scroll). */
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.flashcard-back::-webkit-scrollbar {
+  width: 10px;
+}
+
+.flashcard-back::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+.flashcard-back::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 /* Sudut kertas terlipat pada sisi depan */

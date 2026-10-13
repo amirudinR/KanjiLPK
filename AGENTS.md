@@ -155,6 +155,29 @@ fokus dilewati. Di HP, memfokuskan tombol memicu scroll + ring fokus yang
 tampak seperti kedipan. Jangan hapus guard ini; kehilangan fokus keyboard di
 desktop justru regresi aksesibilitas kecil, sedangkan tanpa guard = kedip di HP.
 
+### 5. Isi kartu sisi belakang harus bisa di-scroll — jangan dibalik oleh klik drag
+
+Gejala: kartu sisi belakang (Bacaan/Arti/Kanji/Contoh) isinya lebih tinggi dari
+kartu, lalu **tidak bisa digulir** — setiap kali mencoba scroll, kartu justru
+terbalik kembali ke sisi depan.
+
+Penyebab: `.flashcard-flip` (induk) punya `onClick` untuk membalik kartu.
+Karena `.flashcard-back` berada **di dalam** elemen induk itu, klik yang
+mengakhiri gesture scroll dianggap "tap" → kartu keburu terbalik.
+
+Perbaikan yang sudah dipasang:
+- `Flashcard.jsx`: `pointerStartRef` merekam titik `pointerdown`; `handleCardClick`
+  mem-`return` tanpa membalik kalau pointer berpindah >10px (`dx > 10 || dy > 10`).
+  Tap murni (delta ~0–2px) tetap membalik; drag/scroll tidak.
+- `flashcard.css`: `.flashcard-back` diberi `scrollbar-gutter: stable`,
+  `scrollbar-width: thin`, `scrollbar-color: var(--accent) transparent`, plus
+  `::-webkit-scrollbar` yang lebih tebal (10px). Sebelumnya scrollbar terlalu
+  tipis/auto-hide sehingga terkesan isi kartu tidak bisa di-scroll.
+
+**Jangan** hilangkan guard drag di `handleCardClick` — tanpa itu, scroll kartu
+kembali membalik kartu. Jangan ubah `overflow: hidden` pada `.flashcard-face`
+(lihat poin 2) — scroll tetap ditangani `.flashcard-back` yang `overflow-y: auto`.
+
 ### Regresi yang HARUS diuji ulang setelah menyentuh flashcard
 
 Setelah mengubah `flashcard.css`, `responsive.css`, atau `Flashcard.jsx`, uji:

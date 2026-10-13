@@ -37,6 +37,9 @@ function Flashcard({
     }
   })
   const flipButtonRef = useRef(null)
+  // Lacak posisi pointer saat mulai menyentuh kartu. Dipakai untuk membedakan
+  // tap (ingin membalik) dari drag/scroll isi kartu (jangan membalik).
+  const pointerStartRef = useRef(null)
 
   const toggleAsideSide = useCallback(() => {
     setAsideSide((side) => {
@@ -81,6 +84,28 @@ function Flashcard({
   const toggleFlip = useCallback(() => {
     setFlipped((v) => !v)
   }, [])
+
+  // Mulai melacak titik sentuh/klik saat pointer turun di kartu.
+  const handleCardPointerDown = useCallback((e) => {
+    pointerStartRef.current = { x: e.clientX, y: e.clientY }
+  }, [])
+
+  // Baling kartu hanya kalau interaksinya benar-benar "tap", bukan drag.
+  // Jika jari/kursor berpindah cukup jauh (mis. sedang menggulir isi kartu
+  // sisi belakang), klik diabaikan supaya scroll tidak ikut membalik kartu.
+  const handleCardClick = useCallback(
+    (e) => {
+      const start = pointerStartRef.current
+      pointerStartRef.current = null
+      if (start) {
+        const dx = Math.abs(e.clientX - start.x)
+        const dy = Math.abs(e.clientY - start.y)
+        if (dx > 10 || dy > 10) return
+      }
+      toggleFlip()
+    },
+    [toggleFlip],
+  )
 
   const handlePrev = useCallback(() => {
     if (safeIndex > 0) {
@@ -265,7 +290,8 @@ function Flashcard({
       >
         <div
           className={`flashcard-flip ${flipped ? 'is-flipped' : ''} ${slideDir !== 0 ? `slide-${slideDir > 0 ? 'right' : 'left'}` : ''}`}
-          onClick={toggleFlip}
+          onClick={handleCardClick}
+          onPointerDown={handleCardPointerDown}
           onKeyDown={onCardKeyDown}
           role="button"
           tabIndex={0}
