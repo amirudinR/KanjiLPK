@@ -105,7 +105,8 @@
 /* --- Jilid buku --- */
 .notebook {
   position: relative;
-  width: min(1120px, 100%);
+  width: 100%;
+  max-width: none;
   background-color: var(--paper);
   /* Kertas nyata: baris samar + tepi kanan agak gelap (bayangan lembar). */
   background-image:
