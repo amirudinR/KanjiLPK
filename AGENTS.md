@@ -314,10 +314,11 @@ ke deployment baru (tidak nyangkut).
 
 | Item | Nilai |
 | --- | --- |
-| Commit terakhir yang di-push | (menyusul) — "feat: Game Kanji (5 level × 5 mode, sesi 100 soal, timer, riwayat)" |
+| Commit terakhir yang di-push | `6f172bd` — "feat: Game Kanji - 5 level x 5 mode, sesi 100 soal, timer, riwayat lokal, animasi" (14 Okt 2026) |
 | File yang diubah | `src/utils/kanjiGame.js` (baru), `src/hooks/useKanjiGameStore.js` (baru), `src/components/KanjiGame.jsx` (baru), `src/components/kanjigame/HistoryPanel.jsx` (baru), `src/styles/kanjigame.css` (baru), `src/components/Icon.jsx`, `src/App.jsx`, `src/styles/index.css`, `AGENTS.md` |
-| Status push ke `origin/main` | ⏳ pending |
-| Status `npx vercel --prod` | ⏳ pending |
+| Status push ke `origin/main` | ✅ sudah (`930bc12..6f172bd`) |
+| Status `npx vercel --prod` | ✅ sudah (14 Okt 2026) — deployment `kanjilpk-3yq8eay66…`, `readyState: READY` |
+| Verifikasi | Bundle produksi `assets/index-C0mTlyPC.js` memuat "Game Kanji", "Senpai", "Mulai Main", "Riwayat Bermain", key `kanji-hafalan-game-v1` |
 
 > **Aturan anti-bentrok proyek ini:**
 > - Proyek Kanji **hanya** di `D:\LPK\KanjiLPK-asli` (repo `KanjiLPK`, domain
