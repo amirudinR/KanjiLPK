@@ -202,7 +202,9 @@ function AllWords({
             return (
               <div
                 key={item.id}
-                className={`allwords-card-wrapper ${isExpanded ? 'is-expanded' : ''}`}
+                className={`allwords-card-wrapper ${isExpanded ? 'is-expanded' : ''} ${
+                  item.kata.length >= 5 || item.arti.length >= 16 ? 'is-wide' : ''
+                }`}
               >
                 <div className="allwords-card-shell">
                   <button

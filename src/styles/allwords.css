@@ -188,6 +188,13 @@
   align-items: start;
 }
 
+/* Pada layar sempit, span 2 kolom bisa terlalu lebar → matikan. */
+@media (max-width: 560px) {
+  .allwords-card-wrapper.is-wide {
+    grid-column: auto;
+  }
+}
+
 /* Pembungkus relatif untuk kartu + tombol aksi (speaker, toggle). */
 .allwords-card-shell {
   position: relative;
@@ -284,6 +291,12 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  min-width: 0;
+}
+
+/* Kartu isi panjang melebar 2 kolom (lihat catatan di .allwords-grid). */
+.allwords-card-wrapper.is-wide {
+  grid-column: span 2;
 }
 
 .allwords-card-wrapper.is-expanded {
@@ -405,13 +418,17 @@
   font-weight: 900;
   font-size: 2rem;
   color: var(--accent-deep);
-  line-height: 1.1;
+  line-height: 1.15;
   max-width: 100%;
   overflow-wrap: anywhere;
-  /* Jepang: utamakan tidak memotong tengah kata; cenderung 1-2 baris
-     supaya kartu melebar mendatar, bukan menjulang ke bawah. */
-  word-break: keep-all;
+  /* Jepang: jangan potong tengah kata (tanda baca Jepang tetap ikut aturan). */
   line-break: strict;
+}
+
+/* Kartu wide: perkecil sedikit font kata supaya panjangnya muat mendatar,
+   sehingga kartu melebar ke kanan-kiri alih-alih menjulang ke bawah. */
+.allwords-card-wrapper.is-wide .allwords-card-kata {
+  font-size: 1.55rem;
 }
 
 .allwords-card-baca {
