@@ -11,6 +11,27 @@
       content="Buku catatan hafalan kanji JFT — flashcard berurutan dengan audio, kuis, dan progres belajar."
     />
     <title>Kanji Notebook · Hafalan Kanji JFT</title>
+    <!-- Terapkan tema SEBELUM paint pertama supaya tidak ada kedip putih
+         saat mode gelap. Harus blocking & di head (dijalankan sebelum body). -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('kanji-hafalan-theme-v1');
+          var theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.style.colorScheme = theme;
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', theme === 'dark' ? '#12141a' : '#f6f1e3');
+        } catch (e) {
+          /* localStorage/matchMedia tidak tersedia */
+        }
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

@@ -367,8 +367,21 @@ atau menimpanya tanpa sengaja. Perbarui tabel ini setiap menyentuh flashcard.
 | 1 | `AllWords.jsx`, `allwords.css` | Kartu grid: bungkus tombol kartu dalam `.allwords-card-shell`; tombol aksi (speaker + toggle) pindah ke `.allwords-card-actions` absolute kanan-atas (bukan lagi `<span>` di dalam `<button>`); kartu `padding` atas dinaikkan; kata/baca/arti dapat `max-width:100%` + `overflow-wrap:anywhere` | Teks kanji panjang menabrak tombol `+` di pojok; tombol di dalam `<button>` (HTML invalid) | ada |
 | 2 | `AllWords.jsx`, `App.jsx` | Tambah tombol **speaker** (`SpeakerButton`) di kartu grid & baris tabel list; `AllWords` menerima `{...speechProps}` (onSpeak, speechSupported, hasJapaneseVoice) dari App | Belum ada pelafalan di halaman Semua Kosakata | ada |
 | 3 | `allwords.css` | Style `.allwords-card-speak` & `.allwords-row-speak` (22px, ikon 13px, tanpa shadow) + `.allwords-card-actions` | Menyesuaikan tombol mini di kartu/baris | ada |
+| 4 | `allwords.css`, `AllWords.jsx` | Kartu isi panjang melebar: wrapper dapat class `is-wide` (kata ≥5 char / arti ≥16 char) → `grid-column: span 2`; font kata wide dikecilkan; lepas `word-break: keep-all` | Kartu isi panjang menjulang ke bawah (tinggi-sempit), harusnya melebar ke kanan-kiri | ada |
+| 5 | `layout.css`, `allwords.css` | `.notebook` `width:100%` + `max-width:none` (dulu `min(1120px,100%)`); grid `minmax` 190px→210px | Konten tidak penuh di desktop (ruang kosong kiri-kanan) | ada |
 
 **Catatan AllWords:** tombol aksi grid berada di `.allwords-card-actions` (absolute kanan-atas). Jangan kembalikan toggle `+`/speaker ke dalam elemen `<button class="allwords-card">` — nested button invalid & bikin event aneh. `onSpeak` membacakan `item.baca` (furigana), bukan kanji.
+
+### Anti-flash tema (JANGAN dihapus)
+
+Kedip putih saat mode gelap (tema gelap baru diterapkan setelah React jalan) dicegah
+dengan **inline script blocking di `<head>` `index.html`** yang men-set
+`data-theme` dari `localStorage`/`prefers-color-scheme` **sebelum paint pertama**.
+Kunci localStorage wajib sama dengan `THEME_KEY` di `src/hooks/useTheme.js`
+(`kanji-hafalan-theme-v1`). `html` juga diberi `background-color: var(--paper-2)`
+supaya area overscroll ikut bertema. **Jangan hapus inline script ini** — kalau
+dihapus, kedip putih (FOUC) muncul lagi saat dark mode. Kalau `THEME_KEY` diubah,
+ubah juga string di `index.html`.
 
 ## Menjalankan
 

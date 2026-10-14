@@ -164,6 +164,9 @@
 html {
   -webkit-text-size-adjust: 100%;
   color-scheme: light;
+  /* Latar dasar html ikut tema supaya area overscroll tidak putih/terang
+     saat mode gelap (mencegah kedip terang sebelum React jalan). */
+  background-color: var(--paper-2);
 }
 
 :root[data-theme='dark'] {
