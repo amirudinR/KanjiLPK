@@ -44,6 +44,9 @@ function KanjiGame({
   const [levelId, setLevelId] = useState(LEVELS[0].id)
   const [modeId, setModeId] = useState(MODES[0].id)
   const [sessionIdx, setSessionIdx] = useState(0)
+  // Hasil run terakhir yang dioper Play→Result. Sumber utama layar Hasil
+  // supaya tidak bergantung timing penyimpanan store (anti-race).
+  const [lastResult, setLastResult] = useState(null)
 
   const level = useMemo(
     () => LEVELS.find((l) => l.id === levelId) ?? LEVELS[0],
@@ -112,7 +115,10 @@ function KanjiGame({
           onSpeak={onSpeak}
           speechSupported={speechSupported}
           hasJapaneseVoice={hasJapaneseVoice}
-          onFinish={() => setPhase('result')}
+          onFinish={(finalResult) => {
+            setLastResult(finalResult ?? null)
+            setPhase('result')
+          }}
           onQuit={() => setPhase('menu')}
           onSave={saveSession}
           onHistory={addHistory}
@@ -125,6 +131,7 @@ function KanjiGame({
           mode={mode}
           sessionIdx={sessionIdx}
           totalSesi={totalSesi}
+          lastResult={lastResult}
           results={results}
           best={best}
           history={history}
@@ -283,7 +290,7 @@ function Menu({
             {level.seconds ? `${level.seconds}s/soal` : 'tanpa timer'}
           </span>
         </div>
-        <button type="button" className="btn-primary kg-start" onClick={onStart}>
+        <button type="button" className="btn btn-primary kg-start" onClick={onStart}>
           <Icon name="play" size={18} /> Mulai Main
         </button>
       </div>
@@ -389,6 +396,9 @@ function Play({
   const [timeLeft, setTimeLeft] = useState(level.seconds)
   const startedAtRef = useRef(null)
   const savedRef = useRef(false)
+  // Menandai soal saat ini sudah dijawab. Dipakai timer supaya penalti waktu
+  // habis TIDAK bertambah berkali-kali dalam rentang interval 250ms.
+  const answeredRef = useRef(false)
 
   // Catat waktu mulai sekali saat sesi dibuka (bukan saat render).
   useEffect(() => {
@@ -405,6 +415,7 @@ function Play({
   const handleAnswer = useCallback(
     (option) => {
       if (isAnswered || !current) return
+      answeredRef.current = true
       const ok = option === answer
       setSelected(option)
       if (ok) {
@@ -420,26 +431,28 @@ function Play({
   )
 
   const handleTimeout = useCallback(() => {
-    if (isAnswered || !current) return
+    // Kunci ganda: cegah penalti dobel walau dipanggil beberapa kali
+    // sebelum React sempat me-render ulang (closure masih `isAnswered=false`).
+    if (answeredRef.current || isAnswered || !current) return
+    answeredRef.current = true
     setTimedOut(true)
     setScore((s) => Math.max(0, s - level.penalty))
     if (onWrong) onWrong(current.card.id)
   }, [isAnswered, current, level.penalty, onWrong])
 
-  // Timer per soal: hitung mundur berbasis waktu nyata (interval 1 detik),
+  // Timer per soal: hitung mundur berbasis waktu nyata (interval 250ms),
   // bukan re-render tiap detik. Berhenti saat soal dijawab atau waktu habis.
   useEffect(() => {
     if (level.seconds === 0 || isAnswered || !current) return undefined
     const deadline = Date.now() + level.seconds * 1000
-    const tick = () => {
+    const timerId = window.setInterval(() => {
       const sisa = Math.max(0, Math.ceil((deadline - Date.now()) / 1000))
       setTimeLeft(sisa)
       if (sisa <= 0) {
         window.clearInterval(timerId)
         handleTimeout()
       }
-    }
-    const timerId = window.setInterval(tick, 250)
+    }, 250)
     return () => window.clearInterval(timerId)
   }, [index, isAnswered, level.seconds, current, handleTimeout])
 
@@ -449,23 +462,16 @@ function Play({
     if (index >= total - 1 && isAnswered) {
       savedRef.current = true
       const now = Date.now()
-      onSave(level.id, sessionIdx, {
-        benar: correctCount,
-        total,
-        skor: score,
-        at: now,
-      })
+      const result = { benar: correctCount, total, skor: score, at: now }
+      onSave(level.id, sessionIdx, result)
       onHistory({
-        at: now,
+        ...result,
         levelId: level.id,
         levelName: level.name,
         levelJp: level.jp,
         modeId: mode.id,
         modeTitle: mode.title,
         sessionIdx,
-        benar: correctCount,
-        total,
-        skor: score,
         durationMs: now - startedAtRef.current,
       })
     }
@@ -482,7 +488,16 @@ function Play({
     onHistory,
   ])
 
+  // Hasil final untuk dioper ke layar Result (anti-race: nilai selalu ada).
+  // `at` diisi saat disimpan; di sini tidak perlu jadi nilai presisi.
+  const finalResult = useMemo(
+    () => ({ benar: correctCount, total, skor: score, at: 0 }),
+    [correctCount, total, score],
+  )
+  const finish = useCallback(() => onFinish(finalResult), [onFinish, finalResult])
+
   const handleNext = useCallback(() => {
+    answeredRef.current = false
     setSelected(null)
     setTimedOut(false)
     setTimeLeft(level.seconds)
@@ -496,7 +511,7 @@ function Play({
       if (isAnswered) {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
-          if (isLast) onFinish()
+          if (isLast) finish()
           else handleNext()
         }
         return
@@ -509,7 +524,7 @@ function Play({
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [isAnswered, isLast, current, handleAnswer, handleNext, onFinish])
+  }, [isAnswered, isLast, current, handleAnswer, handleNext, finish])
 
   if (total === 0) {
     return (
@@ -519,7 +534,7 @@ function Play({
             空
           </span>
           <p>Belum ada kata untuk dimainkan di sesi ini.</p>
-          <button type="button" className="btn-ghost" onClick={onQuit}>
+          <button type="button" className="btn btn-ghost" onClick={onQuit}>
             Kembali ke Menu
           </button>
         </div>
@@ -669,8 +684,8 @@ function Play({
               </p>
               <button
                 type="button"
-                className="btn-primary kg-next"
-                onClick={() => (isLast ? onFinish() : handleNext())}
+                className="btn btn-primary kg-next"
+                onClick={() => (isLast ? finish() : handleNext())}
               >
                 {isLast ? 'Lihat Hasil' : 'Soal Berikutnya'} <Icon name="arrow" size={18} />
               </button>
@@ -691,6 +706,7 @@ function Result({
   mode,
   sessionIdx,
   totalSesi,
+  lastResult,
   results,
   best,
   history,
@@ -700,7 +716,9 @@ function Result({
   onClearHistory,
   onResetLevel,
 }) {
-  const r = results[level.id]?.[sessionIdx]
+  // Utamakan hasil run terakhir (dioper langsung, anti-race); kalau tidak ada
+  // (mis. halaman dibuka ulang), jatuh ke rekor tersimpan di store.
+  const r = lastResult ?? results[level.id]?.[sessionIdx]
   const benar = r?.benar ?? 0
   const total = r?.total ?? 0
   const skor = r?.skor ?? 0
@@ -752,15 +770,15 @@ function Result({
 
       <div className="kg-result-actions">
         {hasNext ? (
-          <button type="button" className="btn-primary" onClick={onNext}>
+          <button type="button" className="btn btn-primary" onClick={onNext}>
             <Icon name="arrow" size={18} /> Sesi Berikutnya
           </button>
         ) : (
-          <button type="button" className="btn-primary" onClick={onMenu}>
+          <button type="button" className="btn btn-primary" onClick={onMenu}>
             <Icon name="flag" size={18} /> Selesai — Pilih Level
           </button>
         )}
-        <button type="button" className="btn-ghost" onClick={onReplay}>
+        <button type="button" className="btn btn-ghost" onClick={onReplay}>
           <Icon name="reset" size={18} /> Ulangi Sesi
         </button>
         <button type="button" className="kg-chip kg-chip-off" onClick={onMenu}>

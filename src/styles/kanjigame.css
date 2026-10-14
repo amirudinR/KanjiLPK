@@ -650,8 +650,8 @@
 .kg-back {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   flex: none;
   color: var(--ink-soft);
   background: var(--card);
@@ -718,8 +718,9 @@
 
 .kg-timer-track {
   flex: 1;
-  height: 8px;
+  height: 12px;
   background: var(--paper-2);
+  border: 1px solid var(--paper-edge);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -838,6 +839,7 @@
   align-items: center;
   gap: 12px;
   width: 100%;
+  min-height: 52px;
   padding: 12px 14px;
   text-align: left;
   background: var(--card);
@@ -864,8 +866,8 @@
 .kg-option-letter {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   flex: none;
   font-family: var(--font-hand);
   font-size: 1rem;
@@ -1170,8 +1172,10 @@
 .kg-chip {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
-  padding: 4px 12px;
+  min-height: 40px;
+  padding: 6px 14px;
   font-size: 0.82rem;
   border-radius: 999px;
   border: 2px solid var(--paper-edge);
@@ -1194,6 +1198,268 @@
 .kg-chip-off:hover {
   border-color: var(--accent);
   color: var(--accent-deep);
+}
+
+/* ================================================================== *
+   MOBILE — tablet kecil & ponsel (<= 760px)
+   Tujuan: game nyaman dipakai dengan jempol — tap target besar, kartu
+   tidak memakan seluruh layar, opsi jawaban muat tanpa scroll panjang,
+   dan aman dari poni (notch) / gesture bar.
+ * ================================================================== */
+@media (max-width: 760px) {
+  /* Header game: beri ruang kanan supaya tidak tertimpa tombol
+     "Mode Fokus" / "Kunci Putar" yang posisinya absolute. */
+  .kg-hero {
+    padding-right: 108px;
+    gap: 12px;
+  }
+
+  .kg-hero-kanji {
+    width: 52px;
+    height: 52px;
+    font-size: 2rem;
+  }
+
+  .kg-hero-sub {
+    font-size: 0.9rem;
+  }
+
+  /* Statistik: 2 kolom compact, angka lebih kecil. */
+  .kg-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .kg-stat {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .kg-stat-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .kg-stat-body strong {
+    font-size: 1.25rem;
+  }
+
+  .kg-stat-body small {
+    font-size: 0.68rem;
+  }
+
+  /* Kartu level: 2 kolom compact supaya tidak scroll panjang. */
+  .kg-grid-levels {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .kg-grid-modes {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .kg-card {
+    padding: 11px;
+    gap: 9px;
+  }
+
+  /* Di kartu level 2-kolom, isi menumpuk vertikal & teks mengecil. */
+  .kg-level {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 7px;
+  }
+
+  .kg-level-emoji {
+    width: 38px;
+    height: 38px;
+  }
+
+  .kg-level-name {
+    font-size: 1rem;
+  }
+
+  .kg-level-desc {
+    font-size: 0.78rem;
+  }
+
+  .kg-level-tags {
+    gap: 4px;
+    margin-top: 2px;
+  }
+
+  .kg-tag {
+    font-size: 0.66rem;
+    padding: 1px 6px;
+  }
+
+  .kg-mode-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .kg-mode-title {
+    font-size: 0.95rem;
+  }
+
+  .kg-mode-desc {
+    font-size: 0.8rem;
+  }
+
+  /* Bar mulai: tombol full width supaya mudah dijangkau jempol. */
+  .kg-startbar {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .kg-start {
+    width: 100%;
+    justify-content: center;
+    min-height: 48px;
+  }
+
+  /* Grid sesi: kolom lebih kecil, rapi. */
+  .kg-session-grid {
+    grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+    gap: 7px;
+  }
+
+  /* --- Area main (Play) --- */
+  .kg-playbar {
+    gap: 8px;
+  }
+
+  .kg-playbar-text {
+    font-size: 0.85rem;
+  }
+
+  .kg-playbar-score {
+    font-size: 1.1rem;
+  }
+
+  .kg-play {
+    gap: 10px;
+  }
+
+  /* Kartu soal di mobile: lebih pendek supaya opsi ikut terlihat. */
+  .kg-prompt {
+    padding: 16px 14px;
+    gap: 6px;
+  }
+
+  .kg-prompt-text.is-kanji {
+    font-size: clamp(3rem, 22vw, 5rem);
+  }
+
+  .kg-prompt-text.is-kana {
+    font-size: clamp(1.9rem, 12vw, 3rem);
+  }
+
+  .kg-prompt-text.is-long {
+    font-size: clamp(1.25rem, 6vw, 1.8rem);
+  }
+
+  /* Opsi jawaban: teks lebih rapat, tinggi tetap besar (tap target). */
+  .kg-answers-hint {
+    font-size: 0.88rem;
+  }
+
+  .kg-options {
+    gap: 8px;
+  }
+
+  .kg-option {
+    min-height: 48px;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .kg-option-label {
+    font-size: 0.98rem;
+  }
+
+  .kg-option-label.is-jp {
+    font-size: 1.2rem;
+  }
+
+  /* Feedback: tombol besar & mudah ditekan. */
+  .kg-next {
+    min-height: 48px;
+  }
+
+  /* Result: kartu tidak terlalu tinggi. */
+  .kg-result {
+    gap: 12px;
+  }
+
+  .kg-result-card {
+    padding: 22px 16px;
+  }
+
+  .kg-result-score strong {
+    font-size: 3.2rem;
+  }
+
+  .kg-result-actions {
+    gap: 8px;
+  }
+
+  .kg-result-actions .btn-primary,
+  .kg-result-actions .btn-ghost {
+    width: 100%;
+    justify-content: center;
+    min-height: 48px;
+  }
+
+  /* Tombol kecil tetap memenuhi target sentuh 44px. */
+  .kg-chip {
+    min-height: 44px;
+  }
+}
+
+/* Ponsel sangat sempit (<= 400px): rapikan lagi. */
+@media (max-width: 400px) {
+  .kg-hero {
+    padding-right: 96px;
+  }
+
+  .kg-hero-sub {
+    font-size: 0.84rem;
+  }
+
+  .kg-grid-levels {
+    grid-template-columns: 1fr;
+  }
+
+  .kg-prompt-text.is-kanji {
+    font-size: clamp(2.6rem, 20vw, 4rem);
+  }
+
+  .kg-option {
+    padding: 10px;
+  }
+
+  .kg-option-label.is-jp {
+    font-size: 1.1rem;
+  }
+}
+
+/* Safe-area: hindari poni (notch) & gesture bar iPhone/Android.
+   Nilai env() bernilai 0 di perangkat tanpa safe-area. */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .kg {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .kg-playbar {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .kg-result-actions {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
 
 /* ------------------------------------------------------------------ *

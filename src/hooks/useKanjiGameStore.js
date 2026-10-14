@@ -15,7 +15,7 @@ export const GAME_STORAGE_KEY = 'kanji-hafalan-game-v1'
 export const HISTORY_LIMIT = 60
 
 function emptyState() {
-  return { results: {}, best: {}, history: [] }
+  return { results: {}, best: {}, bestSessions: {}, history: [] }
 }
 
 function sanitize(raw) {
@@ -28,8 +28,14 @@ function sanitize(raw) {
     raw.best && typeof raw.best === 'object' && !Array.isArray(raw.best)
       ? raw.best
       : {}
+  const bestSessions =
+    raw.bestSessions &&
+    typeof raw.bestSessions === 'object' &&
+    !Array.isArray(raw.bestSessions)
+      ? raw.bestSessions
+      : {}
   const history = Array.isArray(raw.history) ? raw.history : []
-  return { results, best, history }
+  return { results, best, bestSessions, history }
 }
 
 function readStored() {
@@ -58,20 +64,29 @@ export function useKanjiGameStore() {
   const saveSession = useCallback((levelId, sessionIdx, result) => {
     setState((prev) => {
       const levelResults = prev.results[levelId] ?? {}
-      const prevRes = levelResults[sessionIdx]
-      const better =
-        !prevRes ||
-        result.skor > prevRes.skor ||
-        (result.skor === prevRes.skor && result.benar > prevRes.benar)
-      const nextLevel = better
-        ? { ...levelResults, [sessionIdx]: result }
-        : levelResults
+      // `results` = hasil run TERAKHIR tiap sesi (dipakai layar Hasil).
+      // `best` = akumulasi skor TERBAIK tiap sesi level (dipakai statistik).
+      const nextLevel = { ...levelResults, [sessionIdx]: result }
 
-      const best = Object.values(nextLevel).reduce((n, r) => n + (r.skor || 0), 0)
+      const prevBest = prev.bestSessions?.[levelId] ?? {}
+      const prevBestRes = prevBest[sessionIdx]
+      const better =
+        !prevBestRes ||
+        result.skor > prevBestRes.skor ||
+        (result.skor === prevBestRes.skor && result.benar > prevBestRes.benar)
+      const nextBestSessions = better
+        ? { ...prevBest, [sessionIdx]: result }
+        : prevBest
+
+      const best = Object.values(nextBestSessions).reduce(
+        (n, r) => n + (r.skor || 0),
+        0,
+      )
 
       return {
         ...prev,
         results: { ...prev.results, [levelId]: nextLevel },
+        bestSessions: { ...prev.bestSessions, [levelId]: nextBestSessions },
         best: { ...prev.best, [levelId]: best },
       }
     })
@@ -94,7 +109,9 @@ export function useKanjiGameStore() {
       delete results[levelId]
       const best = { ...prev.best }
       delete best[levelId]
-      return { ...prev, results, best }
+      const bestSessions = { ...prev.bestSessions }
+      delete bestSessions[levelId]
+      return { ...prev, results, best, bestSessions }
     })
   }, [])
 
@@ -103,6 +120,7 @@ export function useKanjiGameStore() {
   return {
     results: state.results,
     best: state.best,
+    bestSessions: state.bestSessions,
     history: state.history,
     saveSession,
     addHistory,
