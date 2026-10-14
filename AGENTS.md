@@ -157,6 +157,81 @@ Ikon baru di `Icon.jsx` untuk game: `game`, `timer`, `trophy`, `crown`, `fire`,
 `spark`, `history`. Tambah ikon baru di objek `PATHS` sebelum dipakai — nama
 yang tidak ada akan dirender `null` (tombol kosong).
 
+### ⚠️ ATURAN WAJIB — JANGAN ULANGI BUG INI (pelajaran berharga)
+
+Bug-bug di bawah ini dulu **kelihatan sepele tapi fatal** (teks tak terbaca,
+halaman tak bisa di-scroll, judul ketiban). Semua **sudah diperbaiki** di commit
+`8a2fcc2`. Kalau menyentuh CSS game / tema, **jalankan checklist ini**.
+
+#### 1. JANGAN hardcode warna teks di atas latar yang berubah antar tema
+
+`--danger`, `--highlight`, `--accent-deep`, `--success` **berbeda nilai** di
+mode terang vs gelap. Di mode gelap `--danger` jadi salmon terang & `--highlight`
+jadi kuning — jadi teks **putih/biru-muda di atasnya jadi tak terbaca**
+(rasio sampai **1.13:1**!).
+
+| Kombinasi LARANGAN | Dulu | Sekarang |
+| --- | --- | --- |
+| `#fff` di atas `var(--danger)` | 2.65:1 ❌ | override → `#2b2a26` |
+| `var(--accent-deep)` di atas `var(--highlight)` | 1.13:1 ❌ | → `#2b2a26` |
+| `#7a6412` di atas `var(--highlight)` | 3.15:1 ❌ | → `#2b2a26` |
+| `#fff` di atas `var(--accent-deep)` (mode gelap) | ~1.2:1 ❌ | → `#14202b` |
+
+**Cara benar:** teks di atas latar terang (kuning `--highlight`, salmon
+`--danger`) **selalu pakai `#2b2a26`** (gelap) → aman di kedua tema. Kalau butuh
+warna beda per tema, **override di `dark.css`** (jangan ubah token global — bisa
+kena semua tab). Elemen yang sudah punya override: `.kg-hero-kanji`, `.kg-stamp`,
+`.kg-chip-on`, `.kg-stat.tone-accent/.tone-seal`, `.kg-level.tone-hard/.tone-master`,
+`.kg-tag.is-accent`, `.kg-history-badge`.
+
+**Kontras minimum = 4.5:1** (WCAG AA). Verifikasi dengan script rasio sebelum
+commit (contoh ada di riwayat commit).
+
+#### 2. JANGAN kunci `overflow`/`height` global di media query mobile
+
+`responsive.css` dulu punya `body { overflow: hidden; height: 100dvh }` di blok
+`@media (max-width: 760px) and (orientation: portrait)` yang berlaku untuk
+**SEMUA** konten → **halaman jadi tak bisa di-scroll** (menu Game panjang
+terpotong). Perbaikannya: **scope ke `.is-landscape`** saja pakai `:has()`:
+
+```css
+body:has(.notebook.is-landscape) { overflow: hidden; height: 100dvh; }
+.app:has(.notebook.is-landscape) { height: 100dvh; }
+```
+
+**Aturan:** kalau mengunci scroll/tinggi viewport, **selalu scope ke kelas
+khusus** (bukan `body`/`.app` polos). Konten tab normal HARUS selalu bisa scroll.
+
+#### 3. JANGAN taruh tombol absolute di atas header tanpa ruang
+
+Tombol **"Mode Fokus"** (`right: 12px`) & **"Kunci Putar"** (`right: 118px`)
+`position: absolute; top: 10px` di dalam `.notebook`. Dulu `.notebook-head`
+hanya dikasih `padding-right: 92px` → **judul "Buku Hafalan Kanji" ketiban
+tombol** di mobile. Perbaikan: `padding-right: 0; padding-top: 46px` (beri
+baris ruang untuk tombol). **Kalau menambah tombol mengambang, pastikan header
+punya ruang (`padding-top`/`padding-right`) yang cukup.**
+
+#### 4. Kontras token tema gelap
+
+`--ink-faint` (`#a8a294`) & `--ink-soft` (`#c4bfb2`) di mode gelap sudah
+dinaikkan agar **≥5.35:1**. **Jangan turunkan lagi** di bawah 4.5:1 — banyak
+label kecil (`.kg-prompt-label`, `.kg-history-sub`, `.kg-result-eyebrow`,
+`.foot-note`) bergantung padanya.
+
+#### 5. Checklist uji wajib sebelum commit perubahan UI
+
+1. `npm run lint` (oxlint) + `npm run build` — **harus hijau**.
+2. Render di viewport **390px & 512px**, **mode gelap & terang**.
+3. Cek: (a) **scroll** sampai footer, (b) **judul tidak ketiban** tombol,
+   (c) **semua teks terbaca** (terutama di atas kuning/merah), (d) tak ada
+   error di console.
+4. Hitung rasio kontras elemen yang diubah (target ≥4.5:1).
+
+> **Catatan deploy:** Vercel auto-deploy dari GitHub **TIDAK aktif** untuk
+> proyek ini (lihat bagian Deploy). Setelah push, jalankan `npx vercel --prod`
+> manual. Kalau domain masih menyajikan hash bundle lama, itu **cache browser**
+> (hard-refresh), bukan deploy rusak — pastikan dulu semua asset HTTP 200.
+
 ## Flashcard — catatan penting (JANGAN dikembalikan)
 
 Tiga perbaikan pernah dilakukan pada kartu hafalan. Semuanya sengaja dipasang
@@ -314,11 +389,12 @@ ke deployment baru (tidak nyangkut).
 
 | Item | Nilai |
 | --- | --- |
-| Commit terakhir yang di-push | `6f172bd` — "feat: Game Kanji - 5 level x 5 mode, sesi 100 soal, timer, riwayat lokal, animasi" (14 Okt 2026) |
-| File yang diubah | `src/utils/kanjiGame.js` (baru), `src/hooks/useKanjiGameStore.js` (baru), `src/components/KanjiGame.jsx` (baru), `src/components/kanjigame/HistoryPanel.jsx` (baru), `src/styles/kanjigame.css` (baru), `src/components/Icon.jsx`, `src/App.jsx`, `src/styles/index.css`, `AGENTS.md` |
-| Status push ke `origin/main` | ✅ sudah (`930bc12..6f172bd`) |
-| Status `npx vercel --prod` | ✅ sudah (14 Okt 2026) — deployment `kanjilpk-3yq8eay66…`, `readyState: READY` |
-| Verifikasi | Bundle produksi `assets/index-C0mTlyPC.js` memuat "Game Kanji", "Senpai", "Mulai Main", "Riwayat Bermain", key `kanji-hafalan-game-v1` |
+| Commit terakhir yang di-push | `8a2fcc2` — "fix(ui): kontras warna fatal mode gelap + scroll mobile + header ketiban" |
+| Riwayat commit fitur | `6f172bd` (feat Game Kanji) → `004d5e6` (fix mobile+timer/penalti/result) → `8a2fcc2` (fix kontras/scroll/header) |
+| File yang diubah (`8a2fcc2`) | `src/index.css`, `src/styles/dark.css`, `src/styles/kanjigame.css`, `src/styles/responsive.css`, `AGENTS.md` |
+| Status push ke `origin/main` | ✅ sudah (`004d5e6..8a2fcc2`) |
+| Status `npx vercel --prod` | ✅ sudah — deployment `kanjilpk-a7pq9a689…`, `readyState: READY` |
+| Verifikasi | Semua asset produksi HTTP **200**; CSS produksi memuat `kg-hero-kanji`, `kg-chip-on`, `data-theme`. Kontras & scroll diverifikasi via headless Chrome di 390/512px (gelap & terang) |
 
 > **Aturan anti-bentrok proyek ini:**
 > - Proyek Kanji **hanya** di `D:\LPK\KanjiLPK-asli` (repo `KanjiLPK`, domain
@@ -328,6 +404,9 @@ ke deployment baru (tidak nyangkut).
 >   agar tidak menimpa perbaikan yang sudah ada.
 > - Setelah setiap perubahan: `npm run lint` + `npm run build` **wajib** lolos,
 >   lalu commit → push → `npx vercel --prod`, dan perbarui "Status deploy terakhir".
+> - **Sebelum menyentuh CSS/tema:** baca bagian "⚠️ ATURAN WAJIB — JANGAN ULANGI
+>   BUG INI" di atas. Bug kontras warna, scroll mobile, & header ketiban pernah
+>   fatal dan sudah diperbaiki — jangan sampai kambuh.
 
 ## Struktur
 
