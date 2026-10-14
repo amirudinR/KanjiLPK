@@ -11,11 +11,13 @@ import TabNav from './components/TabNav.jsx'
 import ProgressStrip from './components/ProgressStrip.jsx'
 import Dashboard from './components/Dashboard.jsx'
 import AllWords from './components/AllWords.jsx'
+import KanjiGame from './components/KanjiGame.jsx'
 import './styles/index.css'
 
 const TABS = [
   { id: 'belajar', label: 'Hafalan', icon: 'card' },
   { id: 'kuis', label: 'Kuis', icon: 'quiz' },
+  { id: 'game', label: 'Game', icon: 'game' },
   { id: 'semua', label: 'Semua', icon: 'grid' },
   { id: 'progres', label: 'Progres', icon: 'chart' },
 ]
@@ -24,7 +26,7 @@ function App() {
   const [tab, setTab] = useState(() => {
     try {
       const saved = localStorage.getItem('kanji-notebook:active-tab')
-      return ['belajar', 'kuis', 'semua', 'progres'].includes(saved)
+      return ['belajar', 'kuis', 'game', 'semua', 'progres'].includes(saved)
         ? saved
         : 'belajar'
     } catch {
@@ -272,6 +274,16 @@ function App() {
 
           {tab === 'kuis' && (
             <Quiz
+              items={kosakataJft}
+              statusFor={statusFor}
+              onCorrect={markKnown}
+              onWrong={markLearning}
+              {...speechProps}
+            />
+          )}
+
+          {tab === 'game' && (
+            <KanjiGame
               items={kosakataJft}
               statusFor={statusFor}
               onCorrect={markKnown}

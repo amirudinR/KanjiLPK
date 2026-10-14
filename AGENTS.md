@@ -78,9 +78,84 @@ Pembersihan manual (satu kali per browser yang terpengaruh):
 - **Quiz** — Kuis pilihan ganda dengan keyboard shortcuts (1-4=jawab, Enter=lanjut).
 - **Semua Kosakata** — Grid/list toggle, search, filter status (Semua/Hafal/Belajar/Baru), kartu expandable dengan detail lengkap.
 - **Progres** — Dashboard dengan streak harian, export/import progress, reset dengan konfirmasi 2-klik.
+- **Game Kanji** — Mode "arcade" hafalan kanji: 5 LEVEL × 5 MODE, sesi berisi 100 soal, timer per level, skor + riwayat tersimpan di localStorage. Lihat bagian "Game Kanji" di bawah.
 - **Font** — 13 pilihan font (notebook, clean, rounded, hand, mincho, gothic, kyokasho, kaisho, gyosho, sosho, tegaki, pop, yumincho, meiryo).
 - **Dark Mode** — Toggle terang/gelap dengan transisi halus.
 - **Responsive** — Layout adaptif untuk desktop dan mobile.
+
+## Game Kanji — catatan
+
+Tab **Game** (`src/components/KanjiGame.jsx`) adalah mode latihan "arcade"
+sebagai pelengkap Kuis. Bedanya dengan Kuis: Game menguji **seluruh 613 entri**,
+punya **5 level** dengan timer & jumlah opsi berbeda, **5 mode** kombinasi
+tampil↔jawab, dan mencatat **riwayat skor**.
+
+### Struktur file
+
+| File | Isi |
+| --- | --- |
+| `src/utils/kanjiGame.js` | Logika murni: `LEVELS`, `MODES`, `SESSION_SIZE`, `buildPool`, `buildQuestions`, `fieldValue`, `toRomaji`, `shuffle` |
+| `src/hooks/useKanjiGameStore.js` | Skor & riwayat di localStorage (`kanji-hafalan-game-v1`) |
+| `src/components/KanjiGame.jsx` | Halaman game (3 fase: menu → play → result) |
+| `src/components/kanjigame/HistoryPanel.jsx` | Panel riwayat |
+| `src/styles/kanjigame.css` | Style (import di `styles/index.css`) |
+
+### 5 Level (`LEVELS`)
+
+| Level | id | Batas id kata | Timer | Opsi | Bobot | Penalti |
+| --- | --- | --- | --- | --- | --- | --- |
+| Gampang | `gampang` | ≤ 50 | — | 3 | ×1 | 0 |
+| Sedang | `sedang` | ≤ 150 | 25s | 4 | ×2 | 0 |
+| Menengah | `menengah` | semua | 15s | 4 | ×3 | 0 |
+| Sulit | `sulit` | semua | 10s | 4 | ×4 | 0 |
+| Senpai | `senpai` | semua | 8s | 5 | ×5 | 1 |
+
+- Level rendah sengaja dibatasi ke kata awal (`maxId`) supaya tidak kewalahan.
+- Timer habis = soal dihitung salah. Bar timer memerah saat sisa ≤ 30%.
+- Skor: `+weight` benar, `−penalty` salah (minimum 0).
+
+### 5 Mode (`MODES`)
+
+1. Bacaan → Kanji (`kana` → `kanji`)
+2. Kanji → Arti (`kanji` → `arti`)
+3. Arti → Bacaan (`arti` → `kana`)
+4. Kanji → Bacaan (`kanji` → `kana`)
+5. Kanji → Romaji (`kanji` → `romaji`)
+
+Mode 1–4 memakai data apa adanya. **Mode 5 butuh konversi kana→romaji** karena
+data proyek **tidak menyimpan romaji** — dipakai `toRomaji()` (tabel Hepburn
+sederhana: digraf きゃ/しゅ/っ double konsonan/ー dibuang). Hasilnya perkiraan,
+bukan transkripsi sempurna (mis. コーヒー → "kohi"), tapi cukup untuk opsi kuis.
+
+### Sesi
+
+- `SESSION_SIZE = 100`. Pool urut `id` menaik (bukan diacak) → sesi 1 = kata
+  1–100, dst. 613 kata → **7 sesi**.
+- Opsi jawaban tetap diacak. Pengecoh diambil dari pool; ditambal dari pool
+  penuh lalu dari seluruh 613 entri bila kurang (`buildQuestions`).
+- Snapshot pool di Play dibekukan lewat `useMemo` atas `cards` sesi — tidak
+  berubah di tengah sesi.
+
+### Penyimpanan (`useKanjiGameStore`)
+
+Key `localStorage` **`kanji-hafalan-game-v1`**:
+`{ results: {[levelId]: {[sessionIdx]: {benar,total,skor,at}}}, best: {[levelId]: number}, history: [...] }`.
+`saveSession` menyimpan hasil **terbaik** per sesi; `addHistory` menambah entri
+riwayat (maks `HISTORY_LIMIT = 60`, terbaru di depan).
+
+### Animasi
+
+`kanjigame.css` punya keyframes: `kg-fade-rise`, `kg-pop-in`, `kg-slide-in`,
+`kg-opt-rise`, `kg-shake` (opsi salah), `kg-pulse` (opsi benar), `kg-stamp`
+(cap 満). Semua `transform`/`opacity` saja (60fps) dan dinonaktifkan lewat
+`@media (prefers-reduced-motion: reduce)`.
+
+### Ikon
+
+Ikon baru di `Icon.jsx` untuk game: `game`, `timer`, `trophy`, `crown`, `fire`,
+`clock`, `medal`, `flag`, `trash`, `check`, `cross`, `play`, `arrow`, `back`,
+`spark`, `history`. Tambah ikon baru di objek `PATHS` sebelum dipakai — nama
+yang tidak ada akan dirender `null` (tombol kosong).
 
 ## Flashcard — catatan penting (JANGAN dikembalikan)
 
@@ -239,10 +314,10 @@ ke deployment baru (tidak nyangkut).
 
 | Item | Nilai |
 | --- | --- |
-| Commit terakhir yang di-push | `1c29ee4` — "Perbaiki warning inert React 19 di sisi kartu flashcard" (14 Okt 2026). Sebelumnya: `c928cbd` (scroll kartu), `42d6992` (catatan) |
-| File yang diubah | `src/components/Flashcard.jsx`, `src/styles/flashcard.css`, `src/components/flashcard/FlashcardFront.jsx`, `src/components/flashcard/FlashcardBack.jsx`, `AGENTS.md` |
-| Status push ke `origin/main` | ✅ sudah (`42d6992..1c29ee4`) |
-| Status `npx vercel --prod` | ✅ sudah (14 Okt 2026) — deployment `kanjilpk-a1rdcjm89…`, `readyState: READY`, `Aliased: https://kanjilpk.vercel.app` |
+| Commit terakhir yang di-push | (menyusul) — "feat: Game Kanji (5 level × 5 mode, sesi 100 soal, timer, riwayat)" |
+| File yang diubah | `src/utils/kanjiGame.js` (baru), `src/hooks/useKanjiGameStore.js` (baru), `src/components/KanjiGame.jsx` (baru), `src/components/kanjigame/HistoryPanel.jsx` (baru), `src/styles/kanjigame.css` (baru), `src/components/Icon.jsx`, `src/App.jsx`, `src/styles/index.css`, `AGENTS.md` |
+| Status push ke `origin/main` | ⏳ pending |
+| Status `npx vercel --prod` | ⏳ pending |
 
 > **Aturan anti-bentrok proyek ini:**
 > - Proyek Kanji **hanya** di `D:\LPK\KanjiLPK-asli` (repo `KanjiLPK`, domain
@@ -259,8 +334,8 @@ ke deployment baru (tidak nyangkut).
 src/
   data/kosakata.js     # 613 kosakata JFT (urut sesuai docx)
   data/kanjiDict.js    # kamus 490 kanji (KANJIDIC2)
-  hooks/               # useProgress, useTheme, useSpeech, useFont
-  utils/               # meanings.js, quiz.js, kanjiDetail.js
+  hooks/               # useProgress, useTheme, useSpeech, useFont, useKanjiGameStore
+  utils/               # meanings.js, quiz.js, kanjiDetail.js, kanjiGame.js
   components/
     Icon.jsx           # Ikon SVG
     NotebookHeader.jsx # Header + font picker + theme toggle + badge progres
@@ -269,15 +344,18 @@ src/
     Dashboard.jsx      # Dashboard progres + streak + export/import
     Flashcard.jsx      # Mode hafalan kartu berurutan
     Quiz.jsx           # Mode kuis pilihan ganda
+    KanjiGame.jsx      # Mode game (5 level × 5 mode, timer, riwayat)
     AllWords.jsx       # Halaman Semua Kosakata (grid/list, search, filter, expandable)
     SpeakerButton.jsx  # Tombol pelafalan audio
     flashcard/         # Sub-komponen: Front, Back, Controls, JumpList
     quiz/              # Sub-komponen: Options, Feedback, Result, Icons
+    kanjigame/         # Sub-komponen: HistoryPanel
   styles/
     index.css          # Tema dasar + 13 font options
     layout.css         # Kerangka buku catatan
     flashcard.css      # Mode hafalan
     quiz.css           # Mode kuis
+    kanjigame.css      # Mode game kanji
     dashboard.css      # Dashboard progres
     allwords.css       # Halaman Semua Kosakata
     responsive.css     # Responsif mobile/desktop
