@@ -182,8 +182,10 @@
 /* --- Grid View --- */
 .allwords-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 12px;
+  /* Kartu setinggi isinya — tidak melar ke bawah mengikuti kartu tinggi sebaris. */
+  align-items: start;
 }
 
 /* Pembungkus relatif untuk kartu + tombol aksi (speaker, toggle). */
@@ -406,6 +408,10 @@
   line-height: 1.1;
   max-width: 100%;
   overflow-wrap: anywhere;
+  /* Jepang: utamakan tidak memotong tengah kata; cenderung 1-2 baris
+     supaya kartu melebar mendatar, bukan menjulang ke bawah. */
+  word-break: keep-all;
+  line-break: strict;
 }
 
 .allwords-card-baca {
