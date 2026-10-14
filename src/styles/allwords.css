@@ -186,12 +186,52 @@
   gap: 12px;
 }
 
+/* Pembungkus relatif untuk kartu + tombol aksi (speaker, toggle). */
+.allwords-card-shell {
+  position: relative;
+}
+
+/* Kontainer tombol di kanan-atas kartu (speaker + toggle). */
+.allwords-card-actions {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 2;
+}
+
+.allwords-card-actions .allwords-card-toggle {
+  position: static;
+}
+
+.allwords-card-speak,
+.allwords-row-speak {
+  width: 22px;
+  height: 22px;
+  border-width: 1.5px;
+  box-shadow: none;
+}
+
+.allwords-card-speak .speak-btn-icon,
+.allwords-row-speak .speak-btn-icon {
+  width: 13px;
+  height: 13px;
+}
+
+.allwords-card-speak:hover,
+.allwords-row-speak:hover {
+  transform: scale(1.08);
+  box-shadow: none;
+}
+
 .allwords-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 16px 12px;
+  padding: 26px 12px 16px;
   background: var(--card);
   border: 2px solid var(--card-edge);
   border-radius: 14px;
@@ -199,6 +239,9 @@
   cursor: pointer;
   transition: transform 130ms ease, box-shadow 130ms ease, border-color 130ms ease;
   position: relative;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .allwords-card:hover {
@@ -361,12 +404,17 @@
   font-size: 2rem;
   color: var(--accent-deep);
   line-height: 1.1;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .allwords-card-baca {
   font-family: var(--font-jp);
   font-size: 0.9rem;
   color: var(--ink-soft);
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: center;
 }
 
 .allwords-card-arti {
@@ -374,6 +422,8 @@
   color: var(--ink);
   text-align: center;
   line-height: 1.4;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .allwords-card-known {
@@ -472,6 +522,15 @@
   font-size: 1.3rem;
   color: var(--accent-deep);
   white-space: nowrap;
+}
+
+.allwords-td-kata .allwords-td-kata-inner {
+  margin-right: 8px;
+}
+
+.allwords-row-speak {
+  display: inline-grid;
+  vertical-align: middle;
 }
 
 .allwords-td-baca {

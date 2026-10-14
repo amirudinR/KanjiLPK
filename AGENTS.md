@@ -360,6 +360,16 @@ atau menimpanya tanpa sengaja. Perbarui tabel ini setiap menyentuh flashcard.
 | 5 | `Flashcard.jsx`, `flashcard.css` | Guard drag `pointerStartRef` (tolak flip bila delta >10px) + scrollbar `.flashcard-back` dipertegas | Isi kartu sisi belakang tidak bisa di-scroll; tiap scroll kartu terbalik | ada |
 | 6 | `FlashcardFront.jsx`, `FlashcardBack.jsx` | `inert={flipped ? true : undefined}` (dulu `''`) | React 19 memperingatkan "empty string for a boolean attribute `inert`" di console | ada |
 
+### Riwayat perubahan AllWords / semua kosakata
+
+| # | File | Perubahan | Alasan | Status |
+| --- | --- | --- | --- | --- |
+| 1 | `AllWords.jsx`, `allwords.css` | Kartu grid: bungkus tombol kartu dalam `.allwords-card-shell`; tombol aksi (speaker + toggle) pindah ke `.allwords-card-actions` absolute kanan-atas (bukan lagi `<span>` di dalam `<button>`); kartu `padding` atas dinaikkan; kata/baca/arti dapat `max-width:100%` + `overflow-wrap:anywhere` | Teks kanji panjang menabrak tombol `+` di pojok; tombol di dalam `<button>` (HTML invalid) | ada |
+| 2 | `AllWords.jsx`, `App.jsx` | Tambah tombol **speaker** (`SpeakerButton`) di kartu grid & baris tabel list; `AllWords` menerima `{...speechProps}` (onSpeak, speechSupported, hasJapaneseVoice) dari App | Belum ada pelafalan di halaman Semua Kosakata | ada |
+| 3 | `allwords.css` | Style `.allwords-card-speak` & `.allwords-row-speak` (22px, ikon 13px, tanpa shadow) + `.allwords-card-actions` | Menyesuaikan tombol mini di kartu/baris | ada |
+
+**Catatan AllWords:** tombol aksi grid berada di `.allwords-card-actions` (absolute kanan-atas). Jangan kembalikan toggle `+`/speaker ke dalam elemen `<button class="allwords-card">` — nested button invalid & bikin event aneh. `onSpeak` membacakan `item.baca` (furigana), bukan kanji.
+
 ## Menjalankan
 
 ```bash

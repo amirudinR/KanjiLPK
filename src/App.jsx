@@ -296,6 +296,7 @@ function App() {
             <AllWords
               items={kosakataJft}
               statusFor={statusFor}
+              {...speechProps}
               onJumpToCard={(i) => {
                 setIndex(i)
                 setTab('belajar')

@@ -1,8 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import Icon from './Icon.jsx'
+import SpeakerButton from './SpeakerButton.jsx'
 import { kanjiDetails, relatedWords } from '../utils/kanjiDetail.js'
 
-function AllWords({ items, statusFor, onJumpToCard }) {
+function AllWords({
+  items,
+  statusFor,
+  onJumpToCard,
+  onSpeak,
+  speechSupported = true,
+  hasJapaneseVoice = false,
+}) {
   const [view, setView] = useState(() => {
     try {
       const v = localStorage.getItem('kanji-notebook:allwords-view')
@@ -196,20 +204,37 @@ function AllWords({ items, statusFor, onJumpToCard }) {
                 key={item.id}
                 className={`allwords-card-wrapper ${isExpanded ? 'is-expanded' : ''}`}
               >
-                <button
-                  type="button"
-                  className={`allwords-card allwords-card-${status}`}
-                  onClick={() => handleCardClick(item)}
-                  aria-expanded={isExpanded}
-                >
-                  <span className="allwords-card-no">{item.id}</span>
-                  <span className="allwords-card-kata" lang="ja">{item.kata}</span>
-                  <span className="allwords-card-baca" lang="ja">{item.baca}</span>
-                  <span className="allwords-card-arti">{item.arti}</span>
-                  <span className="allwords-card-toggle" aria-hidden="true">
-                    {isExpanded ? '−' : '+'}
+                <div className="allwords-card-shell">
+                  <button
+                    type="button"
+                    className={`allwords-card allwords-card-${status}`}
+                    onClick={() => handleCardClick(item)}
+                    aria-expanded={isExpanded}
+                  >
+                    <span className="allwords-card-no">{item.id}</span>
+                    <span className="allwords-card-kata" lang="ja">{item.kata}</span>
+                    <span className="allwords-card-baca" lang="ja">{item.baca}</span>
+                    <span className="allwords-card-arti">{item.arti}</span>
+                  </button>
+                  <span className="allwords-card-actions">
+                    <SpeakerButton
+                      className="allwords-card-speak"
+                      onClick={() => onSpeak?.(item.baca)}
+                      label={`Bacakan ${item.baca}`}
+                      supported={speechSupported}
+                      japanese={hasJapaneseVoice}
+                    />
+                    <button
+                      type="button"
+                      className="allwords-card-toggle"
+                      onClick={() => handleCardClick(item)}
+                      aria-expanded={isExpanded}
+                      aria-label={isExpanded ? 'Tutup detail' : 'Buka detail'}
+                    >
+                      {isExpanded ? '−' : '+'}
+                    </button>
                   </span>
-                </button>
+                </div>
                 {isExpanded && (
                   <div className="allwords-card-detail">
                     <div className="allwords-detail-section">
@@ -279,7 +304,16 @@ function AllWords({ items, statusFor, onJumpToCard }) {
                     onClick={() => handleJumpToCard(item._index)}
                   >
                     <td className="allwords-td-no">{item.id}</td>
-                    <td className="allwords-td-kata" lang="ja">{item.kata}</td>
+                    <td className="allwords-td-kata" lang="ja">
+                      <span className="allwords-td-kata-inner">{item.kata}</span>
+                      <SpeakerButton
+                        className="allwords-row-speak"
+                        onClick={() => onSpeak?.(item.baca)}
+                        label={`Bacakan ${item.baca}`}
+                        supported={speechSupported}
+                        japanese={hasJapaneseVoice}
+                      />
+                    </td>
                     <td className="allwords-td-baca" lang="ja">{item.baca}</td>
                     <td className="allwords-td-arti">{item.arti}</td>
                   </tr>
