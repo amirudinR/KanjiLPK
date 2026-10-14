@@ -127,7 +127,7 @@
   font-family: var(--font-jp);
   font-size: 2.4rem;
   font-weight: 900;
-  color: var(--accent-deep);
+  color: #2b2a26;
   background: var(--highlight);
   border: 2px solid var(--accent);
   border-radius: 16px;
@@ -182,7 +182,7 @@
 }
 
 .kg-stat.tone-accent .kg-stat-icon {
-  color: #7a6412;
+  color: #2b2a26;
   background: var(--highlight);
 }
 
@@ -297,7 +297,7 @@
   background: var(--accent-soft);
 }
 .kg-level.tone-mid .kg-level-emoji {
-  color: #7a6412;
+  color: #2b2a26;
   background: var(--highlight);
 }
 .kg-level.tone-hard .kg-level-emoji {
@@ -372,7 +372,7 @@
 }
 
 .kg-tag.is-accent {
-  color: #7a6412;
+  color: #2b2a26;
   background: var(--highlight);
 }
 
@@ -557,7 +557,7 @@
   flex: none;
   font-family: var(--font-jp);
   font-size: 1.15rem;
-  color: #7a6412;
+  color: #2b2a26;
   background: var(--highlight);
   border-radius: 10px;
 }

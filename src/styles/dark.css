@@ -146,3 +146,47 @@
 :root[data-theme='dark'] ::selection {
   color: #2b2a26;
 }
+
+/* ==========================================================================
+   Game Kanji — perbaikan kontras mode gelap
+   Beberapa elemen game memakai teks terang (putih / accent-deep) di atas
+   latar yang di mode gelap justru jadi TERANG (highlight kuning, danger
+   salmon). Akibatnya teks nyaris tak terlihat. Semua teks di atas latar
+   terang dipaksa gelap (#2b2a26) agar terbaca (rasio >= 7:1).
+   ========================================================================== */
+
+/* Kanji besar di kartu hero (遊) di atas latar kuning highlight. */
+:root[data-theme='dark'] .kg-hero-kanji {
+  color: #2b2a26;
+  border-color: #5a4e12;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* Cap "満" (sempurna) & tombol konfirmasi "Ya" — teks di atas danger. */
+:root[data-theme='dark'] .kg-stamp,
+:root[data-theme='dark'] .kg-chip-on {
+  color: #2b2a26;
+  border-color: #c96a5e;
+}
+
+/* Ikon statistik: tone-accent (highlight) & tone-seal (danger). */
+:root[data-theme='dark'] .kg-stat.tone-accent .kg-stat-icon,
+:root[data-theme='dark'] .kg-stat.tone-seal .kg-stat-icon {
+  color: #2b2a26;
+}
+
+/* Ikon level "Sulit" (tone-hard) — teks di atas danger. */
+:root[data-theme='dark'] .kg-level.tone-hard .kg-level-emoji {
+  color: #2b2a26;
+}
+
+/* Ikon level "Senpai" (tone-master) — teks di atas accent-deep. */
+:root[data-theme='dark'] .kg-level.tone-master .kg-level-emoji {
+  color: #14202b;
+}
+
+/* Tag kecil beraksen highlight & badge bab di riwayat. */
+:root[data-theme='dark'] .kg-tag.is-accent,
+:root[data-theme='dark'] .kg-history-badge {
+  color: #2b2a26;
+}

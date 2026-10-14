@@ -7,9 +7,11 @@
     padding: 20px 16px;
   }
 
-  /* Beri ruang tombol Fokus, tapi tidak selebar desktop. */
+  /* Beri ruang untuk DUA tombol mengambang (Kunci Putar + Mode Fokus)
+     di sudut kanan atas; kalau tidak, judul ketiban. */
   .notebook-head {
-    padding-right: 92px;
+    padding-right: 0;
+    padding-top: 46px;
   }
 
   .focus-toggle,
@@ -204,12 +206,15 @@
    fisik ke landscape, tidak diputar lagi (menghindari dobel putar).
    ========================================================================== */
 @media (max-width: 760px) and (orientation: portrait) {
-  body {
+  /* Kunci scroll HANYA saat mode landscape paksa (tab Hafalan) aktif —
+     hanya kotak .notebook.is-landscape yang boleh menggulir. Konten tab
+     lain (mis. menu Game yang panjang) harus tetap bisa di-scroll normal. */
+  body:has(.notebook.is-landscape) {
     overflow: hidden;
     height: 100dvh;
   }
 
-  .app {
+  .app:has(.notebook.is-landscape) {
     padding: 0;
     height: 100dvh;
     align-items: stretch;
