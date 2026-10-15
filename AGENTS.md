@@ -53,27 +53,80 @@ Project Vercel `kanjilpk` **tidak** auto-deploy dari push ke repo `KanjiLPK`.
 Setiap ada perubahan, jalankan deploy manual `npx vercel --prod` dari folder ini.
 (Alternatif: hubungkan ulang repo di Dashboard Vercel → Settings → Git.)
 
-### PENTING — service worker lama "Kotoba" menyodorkan versi basi
+### PENTING — service worker: app INI sekarang PWA (offline-ready)
 
-Sebelum proyek Kanji, domain ini pernah dipakai aplikasi **Kotoba** yang merupakan
-**PWA** (`vite-plugin-pwa`). PWA meninggalkan **service worker** di browser
-pengunjung. Akibatnya browser tetap menyajikan bundle Kotoba lama walau server
-sudah mengirim versi Kanji. Gejala: buka `kanjilpk.vercel.app` di browser normal
-tampil Kotoba, tapi di Incognito tampil "Kanji Notebook" dengan benar.
+Riwayat: domain ini pernah dipakai aplikasi **Kotoba** yang juga PWA, dan
+meninggalkan **service worker** di browser pengunjung. Dulu app Kanji bukan PWA
+dan `index.html` meng-unregister SEMUA service worker.
 
-Solusi yang sudah dipasang: skrip pembersih di `index.html` yang
-**meng-unregister semua service worker** dan **menghapus Cache Storage lama**
-(selain cache milik `kanji-notebook`). App Kanji sendiri **bukan** PWA — tidak
-ada `vite-plugin-pwa` maupun registrasi SW, jadi pembersihan ini aman.
+**Sejak fitur offline dipasang, app Kanji ADALAH PWA** (pakai `vite-plugin-pwa`).
+Skrip pembersih di `index.html` sekarang **hanya** membuang service worker/cache
+**milik aplikasi lain** (pola nama selain `workbox`/`google-fonts`/`kanji`),
+supaya tidak menghapus SW milik kita sendiri. Lihat bagian "PWA / Offline".
 
-Pembersihan manual (satu kali per browser yang terpengaruh):
-1. Buka DevTools (F12) → tab **Application**.
-2. **Service Workers** → klik **Unregister** untuk semua.
-3. **Storage** → **Clear site data**.
-4. Muat ulang dengan **Ctrl+Shift+R**.
+## PWA / Offline
+
+App ini **bisa dipakai offline** dan **di-install ke layar utama HP**
+("Tambahkan ke layar utama" / "Install app").
+
+### Setup
+
+- Plugin: **`vite-plugin-pwa`** (devDependency). Konfigurasi di `vite.config.js`.
+- `registerType: 'autoUpdate'` — versi baru langsung dipakai (tanpa prompt).
+- `injectRegister: 'auto'` — registrasi SW disuntik otomatis saat build.
+- Saat build menghasilkam: `dist/sw.js`, `dist/workbox-*.js`, `dist/manifest.webmanifest`, `dist/registerSW.js`.
+
+### Yang di-cache (offline)
+
+1. **App shell** — semua JS/CSS/HTML + ikon lokal (`globPatterns`), lewat
+   precache Workbox. ~618 KB (17 entri).
+2. **Google Fonts** — `fonts.googleapis.com` (StaleWhileRevalidate) &
+   `fonts.gstatic.com` (CacheFirst, 1 tahun). Jadi font tetap tampil offline.
+3. **Navigasi SPA** — `navigateFallback: '/index.html'` → refresh rute apa pun
+   saat offline tetap membuka app.
+
+> **Catatan:** Canvas cache **bukan** "service worker lama Kotoba". Kalau user
+> melaporkan "masih versi lama", itu cache browser biasa → hard-refresh
+> (Ctrl+Shift+R) / Incognito. Justru sejak jadi PWA, app memang sengaja
+> menyajikan versi dari cache saat offline — itu fitur, bukan bug.
+
+### Ikon PWA
+
+| File | Ukuran | Guna |
+| --- | --- | --- |
+| `public/pwa-192x192.png` | 192×192 | Ikon standar |
+| `public/pwa-512x512.png` | 512×512 | Ikon standar (splash) |
+| `public/pwa-maskable-512x512.png` | 512×512 | Maskable (Android adaptive) |
+| `public/favicon.svg` | vektor | Favicon + ikon `any` |
+| `public/apple-touch-icon.png` | 180×180 | Ikon iOS |
+
+Ikon 192/512/maskable di-render dari `favicon.svg` (kanji 漢 di buku catatan).
+
+### Verifikasi offline (cara uji)
+
+```bash
+npm run build
+npm run preview -- --port 4173
+# buka http://localhost:4173, biarkan SW aktif, lalu:
+#   DevTools → Application → Service Workers (harus ada sw.js aktif)
+#   Network → set Offline → reload → app tetap jalan
+```
+
+Sudah diverifikasi lewat headless Chrome: saat network **dimatikan**, app tetap
+ter-render, 5 tab muncul, dan tab Game bisa dibuka — tanpa error.
+
+### ⚠️ Aturan PWA (jangan diubah tanpa paham)
+
+- **JANGAN** kembalikan skrip "unregister SEMUA service worker" di `index.html` —
+  itu akan **mematikan mode offline**. Skrip sekarang menyaring hanya SW asing.
+- `manifest.start_url`/`scope` = `/` — kalau app dipindah ke subpath, keduanya
+  harus disesuaikan.
+- Setelah mengubah `vite.config.js` PWA, **wajib** `npm run build` & cek
+  `dist/sw.js` + `dist/manifest.webmanifest` ter-generate.
 
 ## Fitur
 
+- **PWA / Offline** — Bisa di-install ke HP & dipakai tanpa internet (app shell + font di-cache). Lihat bagian "PWA / Offline".
 - **Flashcard** — Kartu flip 3D dengan keyboard shortcuts (Space/Enter=flip, ←→=navigasi, K=hafal, L=belajar). Rincian kanji dan contoh kata bisa dibuka-tutup (collapsible).
 - **Quiz** — Kuis pilihan ganda dengan keyboard shortcuts (1-4=jawab, Enter=lanjut).
 - **Semua Kosakata** — Grid/list toggle, search, filter status (Semua/Hafal/Belajar/Baru), kartu expandable dengan detail lengkap.
@@ -412,12 +465,12 @@ ke deployment baru (tidak nyangkut).
 
 | Item | Nilai |
 | --- | --- |
-| Commit terakhir yang di-push | `8a2fcc2` — "fix(ui): kontras warna fatal mode gelap + scroll mobile + header ketiban" |
-| Riwayat commit fitur | `6f172bd` (feat Game Kanji) → `004d5e6` (fix mobile+timer/penalti/result) → `8a2fcc2` (fix kontras/scroll/header) |
-| File yang diubah (`8a2fcc2`) | `src/index.css`, `src/styles/dark.css`, `src/styles/kanjigame.css`, `src/styles/responsive.css`, `AGENTS.md` |
-| Status push ke `origin/main` | ✅ sudah (`004d5e6..8a2fcc2`) |
-| Status `npx vercel --prod` | ✅ sudah — deployment `kanjilpk-a7pq9a689…`, `readyState: READY` |
-| Verifikasi | Semua asset produksi HTTP **200**; CSS produksi memuat `kg-hero-kanji`, `kg-chip-on`, `data-theme`. Kontras & scroll diverifikasi via headless Chrome di 390/512px (gelap & terang) |
+| Commit terakhir yang di-push | `ac9b4ff` — "docs(agents): guardrail anti-regresi" (+ fitur PWA setelahnya) |
+| Riwayat commit fitur | `6f172bd` (feat Game Kanji) → `004d5e6` (fix mobile+timer/penalti/result) → `8a2fcc2` (fix kontras/scroll/header) → `ac9b4ff` (guardrail docs) → **PWA/offline** |
+| File yang diubah (PWA) | `vite.config.js` (plugin PWA), `index.html` (meta + skrip SW), `package.json`, `package-lock.json`, `public/pwa-192x192.png` (baru), `public/pwa-512x512.png` (baru), `public/pwa-maskable-512x512.png` (baru), `AGENTS.md` |
+| Status push ke `origin/main` | ✅ sudah |
+| Status `npx vercel --prod` | ✅ sudah |
+| Verifikasi | Build menghasilkan `sw.js` + `manifest.webmanifest` (precache ~618 KB / 17 entri). Diuji headless Chrome: network **offline** → app tetap render, 5 tab muncul, Game bisa dibuka, font Google ke-cache (`google-fonts-*`), tanpa error |
 
 > **Aturan anti-bentrok proyek ini:**
 > - Proyek Kanji **hanya** di `D:\LPK\KanjiLPK-asli` (repo `KanjiLPK`, domain
@@ -464,4 +517,12 @@ src/
     responsive.css     # Responsif mobile/desktop
     dark.css           # Penyesuaian mode gelap
   App.jsx              # Rangkaian utama (routing)
+public/
+  favicon.svg          # Favicon (kanji 漢)
+  pwa-192x192.png      # Ikon PWA
+  pwa-512x512.png      # Ikon PWA
+  pwa-maskable-512x512.png # Ikon maskable Android
+  apple-touch-icon.png # Ikon iOS
+vite.config.js         # Vite + vite-plugin-pwa (manifest, SW, cache)
+index.html             # Meta PWA + skrip pembersih SW asing + registrasi SW
 ```

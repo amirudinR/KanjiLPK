@@ -3,12 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#f6f1e3" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Kanji Notebook" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta
       name="description"
-      content="Buku catatan hafalan kanji JFT — flashcard berurutan dengan audio, kuis, dan progres belajar."
+      content="Buku catatan hafalan kanji JFT - flashcard berurutan dengan audio, kuis, game, dan progres belajar. Bisa dipakai offline."
     />
     <title>Kanji Notebook · Hafalan Kanji JFT</title>
     <!-- Terapkan tema SEBELUM paint pertama supaya tidak ada kedip putih
@@ -42,21 +47,32 @@
   <body>
     <div id="root"></div>
     <script>
-      // Bersihkan sisa service worker / cache dari aplikasi lama (Kotoba PWA)
-      // yang pernah menempati domain ini, supaya tidak menyodorkan versi basi.
+      // Bersihkan sisa service worker / cache dari aplikasi lain (mis. PWA
+      // "Kotoba") yang pernah menempati domain ini. PENTING: JANGAN hapus
+      // service worker milik aplikasi ini sendiri — kalau dihapus, mode
+      // offline (PWA) tidak akan pernah aktif.
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function (regs) {
           regs.forEach(function (reg) {
-            reg.unregister();
+            var url = (reg.active && reg.active.scriptURL) || reg.scope || '';
+            // Hanya singkirkan SW asing; biarkan workbox milik kita tetap hidup.
+            var ours =
+              url.indexOf('workbox') !== -1 ||
+              url.indexOf('sw.js') !== -1 ||
+              url.indexOf('service-worker') !== -1;
+            if (!ours) reg.unregister();
           });
         });
       }
       if (window.caches && caches.keys) {
         caches.keys().then(function (keys) {
           keys.forEach(function (key) {
-            if (key.indexOf('kanji-notebook') === -1) {
-              caches.delete(key);
-            }
+            // Simpan cache milik kita (google-fonts / workbox), buang sisanya.
+            var keep =
+              key.indexOf('workbox') !== -1 ||
+              key.indexOf('google-fonts') !== -1 ||
+              key.indexOf('kanji') !== -1;
+            if (!keep) caches.delete(key);
           });
         });
       }
