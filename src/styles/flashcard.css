@@ -108,6 +108,10 @@
 .flashcard-flip {
   position: relative;
   min-height: 360px;
+  /* Isi sisi belakang bisa lebih tinggi dari 360px (bacaan + arti + dua
+     accordion). Tanpa ruang tambahan, tombol "Kanji"/"Contoh" terdorong ke
+     luar area yang bisa di-scroll sehingga terasa mati saat diketuk. */
+  height: clamp(360px, 46vh, 480px);
   perspective: 1600px;
   cursor: pointer;
 }
@@ -115,6 +119,7 @@
 .flashcard-inner {
   position: relative;
   width: 100%;
+  height: 100%;
   min-height: 360px;
   transition: transform 560ms cubic-bezier(0.34, 1.16, 0.64, 1);
   transform-style: preserve-3d;
@@ -155,6 +160,10 @@
 .flashcard-back {
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* Izinkan gesture vertikal sampai ke scroller di dalam, supaya isi kartu
+     bisa digulir di HP tanpa dibatalkan oleh handler tap di .flashcard-flip. */
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
   /* Scrollbar dibuat selalu terlihat & lebih tebal supaya jelas bahwa isi
      kartu bisa digulir (sebelumnya tipis/auto-hide sehingga terkesan tidak
      bisa di-scroll). */
@@ -213,6 +222,22 @@
   line-height: 1;
   color: var(--ink);
   text-shadow: 3px 3px 0 rgba(47, 111, 159, 0.16);
+  /* Kanji harus selalu satu baris; panjang kata menentukan ukuran lewat
+     data-len (bukan auto-shrink) supaya 1–2 huruf tetap konsisten besar. */
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.flashcard-kanji[data-len='mid'] {
+  font-size: clamp(4rem, 13vw, 7rem);
+}
+
+.flashcard-kanji[data-len='long'] {
+  font-size: clamp(2.9rem, 9.5vw, 5rem);
+}
+
+.flashcard-kanji[data-len='xlong'] {
+  font-size: clamp(2.2rem, 7.5vw, 3.8rem);
 }
 
 .flashcard-hint {
@@ -898,6 +923,18 @@
     font-size: clamp(2.8rem, 10vh, 5.5rem);
   }
 
+  .flashcard-kanji[data-len='mid'] {
+    font-size: clamp(1.9rem, 6.5vh, 3.6rem);
+  }
+
+  .flashcard-kanji[data-len='long'] {
+    font-size: clamp(1.5rem, 5vh, 2.8rem);
+  }
+
+  .flashcard-kanji[data-len='xlong'] {
+    font-size: clamp(1.2rem, 4vh, 2.2rem);
+  }
+
   .flashcard-hint {
     margin-top: 8px;
     font-size: 1.1rem;
@@ -955,6 +992,18 @@
 @media (min-width: 761px) and (min-height: 620px) and (max-height: 780px) {
   .flashcard-kanji {
     font-size: clamp(2.4rem, 9vh, 4.25rem);
+  }
+
+  .flashcard-kanji[data-len='mid'] {
+    font-size: clamp(1.75rem, 6vh, 3rem);
+  }
+
+  .flashcard-kanji[data-len='long'] {
+    font-size: clamp(1.4rem, 4.5vh, 2.35rem);
+  }
+
+  .flashcard-kanji[data-len='xlong'] {
+    font-size: clamp(1.15rem, 3.6vh, 1.9rem);
   }
 
   .flashcard-jump-list {

@@ -97,6 +97,9 @@ function Flashcard({
     (e) => {
       const start = pointerStartRef.current
       pointerStartRef.current = null
+      // Klik dari tombol/link di dalam kartu (accordion Kanji/Contoh, audio)
+      // bukan gestur membalik kartu — biarkan handler-nya sendiri yang jalan.
+      if (e.target.closest?.('button, a, input, select, textarea')) return
       if (start) {
         const dx = Math.abs(e.clientX - start.x)
         const dy = Math.abs(e.clientY - start.y)

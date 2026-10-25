@@ -23,7 +23,13 @@ function FlashcardFront({
       aria-hidden={flipped}
       inert={flipped ? true : undefined}
     >
-      <span className="flashcard-kanji" lang="ja">
+      <span
+        className="flashcard-kanji"
+        lang="ja"
+        /* Bucket ukuran: 1–2 huruf paling besar, makin panjang makin kecil,
+           supaya kanji selalu muat satu baris (lihat flashcard.css). */
+        data-len={kata.length <= 2 ? 'short' : kata.length <= 4 ? 'mid' : kata.length <= 6 ? 'long' : 'xlong'}
+      >
         {kata}
       </span>
       {speechSupported && hasJapaneseVoice ? (
