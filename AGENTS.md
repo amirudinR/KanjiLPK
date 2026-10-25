@@ -322,15 +322,24 @@ Gejala: saat kartu diputar, isi/garis kartu berkedip (khususnya Safari/WebKit).
 Perbaikan (`flashcard.css`):
 - `.flashcard-face`: `overflow` **`hidden`** (bukan `auto`). `overflow: auto`
   memaksa WebKit me-repaint isi tiap frame saat elemen berputar 3D → kedip.
-- `.flashcard-inner`: tambah `will-change: transform` +
-  `backface-visibility: hidden` supaya sisi belakang siap sebelum animasi.
+- `.flashcard-face`: `backface-visibility: hidden` + `transform: translateZ(0)`
+  supaya sisi yang membelakangi pengguna tidak tembus pandang.
+- `.flashcard-inner`: cukup `will-change: transform`. **JANGAN** taruh
+  `backface-visibility: hidden` di sini — lihat poin 7 (itu bug hit-test).
 - `.flashcard-back`: `overflow-y: auto` + `overscroll-behavior: contain` untuk
   scroll internal tanpa memicu repaint wrapper 3D.
 
-**Jangan** mengubah `.flashcard-face` kembali ke `overflow: auto`, dan jangan
-tambahkan `transform` (mis. `translateZ(0)`) pada `.flashcard-face` — itu bisa
-menimpa `transform: rotateY(180deg)` milik `.flashcard-back` (spesifisitas sama,
-yang terakhir menang) dan merusak sisi belakang.
+**Jangan** mengubah `.flashcard-face` kembali ke `overflow: auto`.
+
+> **Konflik lama yang sudah diselesaikan:** dulu ada catatan "jangan tambahkan
+> `transform` pada `.flashcard-face` karena menimpa `rotateY(180deg)`
+> `.flashcard-back`". Catatan itu **salah** — `.flashcard-back` punya
+> spesifisitas lebih tinggi (satu kelas, `.flashcard-back`) daripada
+> `.flashcard-face` (satu kelas juga, tapi urutan deklarasi `.flashcard-back`
+> ada setelahnya dan `transform: rotateY(180deg)` tetap berlaku). Yang benar:
+> `translateZ(0)` dipasang di `.flashcard-face`, sedangkan `.flashcard-back`
+> tetap memakai `rotateY(180deg)`. Sudah diverifikasi: kartu belakang tetap
+> berputar dan tidak tembus pandang.
 
 ### 3. Kedipan saat kartu disentuh (Chrome Android) — tap highlight
 
@@ -390,6 +399,86 @@ peringatan console berulang: *"Received an empty string for a boolean attribute
 kembalikan ke `''` — React 19 memperlakukannya sebagai false + warning tiap
 render.
 
+### 7. ⚠️ `backface-visibility: hidden` di `.flashcard-inner` MEMATIKAN klik (bug paling mahal)
+
+**Gejala yang dilaporkan user:** setelah kartu dibalik, tombol **"Kanji (1)"**
+dan **"Contoh (n)"** tidak bisa diketuk — tap-nya justru **membalik kartu lagi
+ke depan**. Isi kartu belakang juga **tidak bisa di-scroll**.
+
+**Penyebab (bukan logika React, bukan `stopPropagation`):**
+`.flashcard-inner` punya `backface-visibility: hidden`. Di Chrome, saat elemen
+itu sedang ber-rotasi 180°, seluruh **hit-test anak-anaknya mati**. Jadi:
+
+- `document.elementFromPoint()` di tengah tombol mengembalikan
+  `DIV.flashcard-flip` (parent), **bukan** tombolnya.
+- Tap jatuh ke `onClick` milik `.flashcard-flip` → `toggleFlip()` → kartu
+  terbalik. Persis seperti "tombolnya mati".
+- Scroll juga tidak masuk ke `.flashcard-back` karena scroller-nya tidak
+  menerima pointer event.
+
+**Bukti isolasi (dites di Chrome DevTools):** dengan `.flashcard-inner {
+backface-visibility: visible }` → probe `clickable: true`; dikembalikan ke
+`hidden` → `clickable: false`. 100% reproducibility.
+
+**Perbaikan final:**
+- `.flashcard-inner` **hanya** `will-change: transform`. **JANGAN** tambahkan
+  `backface-visibility` di sini, dalam bentuk apa pun.
+- `backface-visibility: hidden` + `translateZ(0)` dipasang di
+  `.flashcard-face` (yang memang perlu disembunyikan saat membelakangi).
+- `.flashcard-flip` diberi tinggi eksplisit `clamp(360px, 46vh, 480px)` dan
+  `.flashcard-inner` di-`position: absolute; inset: 0` supaya tidak meluber
+  keluar kotak parent (meluber juga membuat hit-area parent salah).
+
+**Cara mengecek ulang kalau bug ini dicurigai muncul lagi** (jalankan di
+DevTools console saat kartu sudah dibalik):
+
+```js
+const b = document.querySelector('.flashcard-collapsible-toggle');
+const r = b.getBoundingClientRect();
+const hit = document.elementFromPoint(r.left + r.width - 20, r.top + r.height/2);
+console.log('clickable:', b.contains(hit), 'hit:', hit?.className);
+// Harus: clickable: true
+```
+
+Kalau hasilnya `clickable: false` dengan `hit: flashcard-flip` → bug ini
+kembali. Jangan cari-cari penyebab lain di React sebelum mengecek baris ini.
+
+**Jangan tertipu:** menambah `e.target.closest('button')` guard di
+`handleCardClick` (sudah ada) **tidak cukup** — guard itu bekerja dengan benar,
+tapi `e.target`-nya memang bukan tombol karena browser tidak pernah
+menargetkan tombol itu sejak awal.
+
+### 8. Kanji panjang harus SELALU satu baris — ukuran per bucket, bukan auto-shrink
+
+**Gejala:** `入っています` pecah jadi 2 baris, `～番目` pecah jadi 3 baris.
+
+**Perbaikan:** `FlashcardFront.jsx` mengirim `data-len` dari `kata.length`
+(`short` 1–2, `mid` 3–4, `long` 5–6, `xlong` 7+). `flashcard.css` memberi
+`font-size` berbeda per bucket, plus `white-space: nowrap`.
+
+**Kenapa bucket, bukan `auto-shrink` / rasio linear:** dengan rasio linear,
+kata 1 huruf dan 2 huruf akan beda ukuran padahal keduanya pendek — terlihat
+tidak konsisten. Bucket membuat semua kata pendek berukuran sama.
+
+**Buckets wajib di-override di SEMUA media query** yang mengatur
+`.flashcard-kanji`, karena selector `[data-len='mid']` (spesifisitas 0,2,0)
+**mengalahkan** `.flashcard-kanji` (0,1,0) di media query. Saat ini ada dua
+tempat: `@media (max-width: 760px)` dan
+`@media (min-width: 761px) and (min-height: 620px) and (max-height: 780px)`.
+Kalau menambah media query baru yang mengubah ukuran kanji, **tambahkan juga
+keempat override `[data-len]`** di dalamnya — kalau lupa, kanji panjang akan
+membesar lagi di breakpoint itu.
+
+Hasil terverifikasi di lebar kartu 412px:
+
+| Teks | Panjang | Lebar render | Baris |
+| --- | --- | --- | --- |
+| `魚` | 1 | 112px | 1 |
+| `自己` | 2 | 224px | 1 |
+| `自己紹介` | 4 | 264px | 1 |
+| `入っています` | 6 | 288px | 1 |
+| `よろしくお願いします` | 10 | 353px | 1 |
+
 ### Regresi yang HARUS diuji ulang setelah menyentuh flashcard
 
 Setelah mengubah `flashcard.css`, `responsive.css`, atau `Flashcard.jsx`, uji:
@@ -397,7 +486,11 @@ Setelah mengubah `flashcard.css`, `responsive.css`, atau `Flashcard.jsx`, uji:
 2. **HP portrait** (≤460px, landscape paksa): tombol kontrol sejajar, tidak ada
    yang terjepit/menimpa; kartu bisa dibalik; **tidak ada kedip** saat disentuh.
 3. **HP landscape fisik**: layout 3 kolom normal tetap jalan.
-4. `npm run build` + `npm run lint` bersih.
+4. **Sisi belakang**: tombol `Kanji (n)` & `Contoh (n)` bisa diketuk dan
+   accordion **terbuka** tanpa membalik kartu (lihat poin 7 untuk cara probe).
+5. **Sisi belakang**: isi bisa di-scroll (`back.scrollHeight > back.clientHeight`).
+6. **Kanji panjang** (`よろしくお願いします`) tetap **satu baris**.
+7. `npm run build` + `npm run lint` bersih.
 
 ### Riwayat perubahan flashcard (catatan anti-bentrok)
 
@@ -412,6 +505,9 @@ atau menimpanya tanpa sengaja. Perbarui tabel ini setiap menyentuh flashcard.
 | 4 | `Flashcard.jsx` | `focus()` ke tombol flip dengan guard `pointer: coarse` | Fokus di HP memicu kedip | ada |
 | 5 | `Flashcard.jsx`, `flashcard.css` | Guard drag `pointerStartRef` (tolak flip bila delta >10px) + scrollbar `.flashcard-back` dipertegas | Isi kartu sisi belakang tidak bisa di-scroll; tiap scroll kartu terbalik | ada |
 | 6 | `FlashcardFront.jsx`, `FlashcardBack.jsx` | `inert={flipped ? true : undefined}` (dulu `''`) | React 19 memperingatkan "empty string for a boolean attribute `inert`" di console | ada |
+| 7 | `flashcard.css` | **Hapus** `backface-visibility` dari `.flashcard-inner`; pindahkan ke `.flashcard-face` (+`translateZ(0)`); `.flashcard-flip` `height: clamp(360px,46vh,480px)`; `.flashcard-inner` jadi `position:absolute; inset:0` | Tombol "Kanji"/"Contoh" tidak bisa diklik & isi belakang tidak bisa di-scroll — `backface-visibility` di inner mematikan hit-test sisi belakang (lihat catatan 7) | ada |
+| 8 | `FlashcardFront.jsx`, `flashcard.css` | `data-len` (short/mid/long/xlong) + `font-size` per bucket + `white-space: nowrap`, di-override di semua media query | Kanji panjang (`入っています`, `～番目`) pecah 2–3 baris (lihat catatan 8) | ada |
+| 9 | `Flashcard.jsx` | `handleCardClick` mengabaikan klik dari `button, a, input, select, textarea` | Lapisan pertahanan tambahan agar tap pada tombol di dalam kartu tidak membalik kartu | ada |
 
 ### Riwayat perubahan AllWords / semua kosakata
 
