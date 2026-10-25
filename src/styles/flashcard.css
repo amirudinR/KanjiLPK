@@ -108,26 +108,27 @@
 .flashcard-flip {
   position: relative;
   min-height: 360px;
-  /* Isi sisi belakang bisa lebih tinggi dari 360px (bacaan + arti + dua
-     accordion). Tanpa ruang tambahan, tombol "Kanji"/"Contoh" terdorong ke
-     luar area yang bisa di-scroll sehingga terasa mati saat diketuk. */
+  /* Sisi belakang berisi bacaan + arti + dua accordion. Tinggi harus cukup
+     agar isinya bisa digulir di dalam kartu, bukan meluber keluar kotak. */
   height: clamp(360px, 46vh, 480px);
   perspective: 1600px;
   cursor: pointer;
 }
 
 .flashcard-inner {
-  position: relative;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  min-height: 360px;
   transition: transform 560ms cubic-bezier(0.34, 1.16, 0.64, 1);
   transform-style: preserve-3d;
   /* Petunjuk ke GPU agar sisi belakang sudah ter-render sebelum putaran,
-     sehingga tidak ada kedip/garis saat kartu dibalik (khusus WebKit). */
+     sehingga tidak ada kedip/garis saat kartu dibalik (khusus WebKit).
+     CATATAN: jangan taruh `backface-visibility: hidden` di sini — itu membuat
+     Chrome mengabaikan hit-test pada tombol di sisi belakang kartu (tombol
+     "Kanji"/"Contoh" jadi tidak bisa diklik). Yang perlu hidden hanya
+     `.flashcard-face`. */
   will-change: transform;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 .flashcard-flip.is-flipped .flashcard-inner {
@@ -146,8 +147,12 @@
   border: 2px solid var(--card-edge);
   border-radius: 16px;
   box-shadow: var(--shadow-paper);
+  /* Sembunyikan sisi yang membelakangi pengguna. Wajib di sini (bukan di
+     .flashcard-inner) supaya hit-test tombol tetap jalan. */
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
   /* `overflow: hidden` (bukan auto) mencegah WebKit me-repaint isi saat
      kartu diputar 3D — dengan `auto`, sisi yang berputar sering tampak
      berkedip/bergaris. Isi panjang tetap bisa di-scroll di dalam
