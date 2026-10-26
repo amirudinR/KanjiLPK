@@ -4,6 +4,11 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // PDF sumber data (5 MB) dikunci oleh Windows sehingga watcher Vite crash
+  // dengan EBUSY. Tidak pernah diimpor app, jadi jangan di-watch.
+  server: {
+    watch: { ignored: ['**/*.pdf'] },
+  },
   plugins: [
     react(),
     VitePWA({
