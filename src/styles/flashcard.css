@@ -293,6 +293,12 @@
   align-items: baseline;
 }
 
+/* Tombol accordion tidak punya <dd> pasangan, jadi jangan dimasukkan ke kolom
+   label 96px — bentang penuh selebar kartu. */
+.flashcard-detail > .flashcard-collapsible-toggle {
+  grid-column: 1 / -1;
+}
+
 .flashcard-detail dt {
   font-family: var(--font-hand);
   font-size: 1.3rem;
