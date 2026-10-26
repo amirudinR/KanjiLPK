@@ -298,6 +298,11 @@ export function fieldValue(item, field) {
  * karena memang itu isi materi JFT.
  */
 export function buildPool(items = kosakataJft, maxId = 613) {
+  // Id kanji berupa angka; id Kotoba berupa string ("k25-3") sehingga tidak
+  // bisa dibandingkan dengan maxId. Untuk id non-angka, pakai posisi array.
+  if (items.some((it) => typeof it.id !== 'number')) {
+    return items.slice(0, maxId)
+  }
   return items
     .filter((it) => it.id <= maxId)
     .slice()

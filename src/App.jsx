@@ -4,6 +4,7 @@ import useProgress from './hooks/useProgress.js'
 import useTheme from './hooks/useTheme.js'
 import useSpeech from './hooks/useSpeech.js'
 import useFont from './hooks/useFont.js'
+import { KOTOBA_TOTAL } from './data/kotobaTotal.js'
 import Flashcard from './components/Flashcard.jsx'
 import Quiz from './components/Quiz.jsx'
 import NotebookHeader from './components/NotebookHeader.jsx'
@@ -13,6 +14,8 @@ import Dashboard from './components/Dashboard.jsx'
 import AllWords from './components/AllWords.jsx'
 import KanjiGame from './components/KanjiGame.jsx'
 import Kotoba from './components/Kotoba.jsx'
+import SourceSwitch from './components/SourceSwitch.jsx'
+import useKotobaItems from './hooks/useKotobaItems.js'
 import './styles/index.css'
 
 const TABS = [
@@ -166,6 +169,37 @@ function App() {
     return `Sisa ${total - counts.known} kosakata lagi menuju tamat.`
   }, [counts.known, total])
 
+  // Sumber soal untuk Kuis & Game: kanji JFT atau Kotoba Minna.
+  const [source, setSource] = useState(() => {
+    try {
+      const saved = localStorage.getItem('kanji-notebook:quiz-source')
+      return saved === 'kotoba' ? 'kotoba' : 'kanji'
+    } catch {
+      return 'kanji'
+    }
+  })
+  const kotobaItems = useKotobaItems()
+
+  const pickSource = useCallback((next) => {
+    setSource(next)
+    try {
+      localStorage.setItem('kanji-notebook:quiz-source', next)
+    } catch {
+      /* abaikan */
+    }
+  }, [])
+
+  const isKotoba = source === 'kotoba'
+  const sourceItems = isKotoba ? (kotobaItems ?? []) : kosakataJft
+  const sourceSwitch = (
+    <SourceSwitch
+      value={source}
+      onChange={pickSource}
+      kanjiCount={total}
+      kotobaCount={KOTOBA_TOTAL}
+    />
+  )
+
   const speechProps = { onSpeak: speak, speechSupported, hasJapaneseVoice }
 
   return (
@@ -284,23 +318,38 @@ function App() {
           )}
 
           {tab === 'kuis' && (
-            <Quiz
-              items={kosakataJft}
-              statusFor={statusFor}
-              onCorrect={markKnown}
-              onWrong={markLearning}
-              {...speechProps}
-            />
+            <>
+              {sourceSwitch}
+              <Quiz
+                key={source}
+                items={sourceItems}
+                statusFor={statusFor}
+                onCorrect={markKnown}
+                onWrong={markLearning}
+                {...speechProps}
+              />
+            </>
           )}
 
           {tab === 'game' && (
-            <KanjiGame
-              items={kosakataJft}
-              statusFor={statusFor}
-              onCorrect={markKnown}
-              onWrong={markLearning}
-              {...speechProps}
-            />
+            <>
+              {sourceSwitch}
+              {isKotoba && !kotobaItems ? (
+                <p className="allwords-empty">Memuat kosakata…</p>
+              ) : (
+                <KanjiGame
+                  key={source}
+                  items={sourceItems}
+                  statusFor={statusFor}
+                  onCorrect={markKnown}
+                  onWrong={markLearning}
+                  title={isKotoba ? 'Game Kotoba' : 'Game Kanji'}
+                  kind={source}
+                  totalHint={isKotoba ? KOTOBA_TOTAL : total}
+                  {...speechProps}
+                />
+              )}
+            </>
           )}
 
           {tab === 'semua' && (

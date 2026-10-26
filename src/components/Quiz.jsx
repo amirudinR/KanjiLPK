@@ -90,7 +90,7 @@ function Quiz({
       <div className="quiz">
         <div className="quiz-card quiz-empty-card">
           <span className="quiz-empty-icon" aria-hidden="true">問</span>
-          <p className="quiz-empty">Belum ada kanji untuk dikuis.</p>
+          <p className="quiz-empty">Belum ada kosakata untuk dikuis.</p>
           <p className="quiz-empty-sub">Tandai beberapa kata sebagai hafal di tab Hafalan dulu.</p>
         </div>
       </div>

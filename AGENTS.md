@@ -552,6 +552,50 @@ Diverifikasi: `{1:known, 2:known, 3:learning, k1-1:known, k2-5:known}`
 Ekspor/impor progres **sengaja** tetap membawa id Kotoba (ikut ter-backup);
 aman karena penghitung sudah menyaring.
 
+### Kuis & Game — pemilih sumber Kanji / Kotoba
+
+Tab Kuis dan Game punya pemilih sumber di atas halaman (`SourceSwitch.jsx`),
+tersimpan di `kanji-notebook:quiz-source` (`kanji` | `kotoba`).
+
+**⚠️ ATURAN WAJIB #5 — id Kotoba tidak bisa dibandingkan dengan `maxId`**
+
+`buildPool(items, maxId)` semula memakai `it.id <= maxId` dengan `maxId`
+berupa angka (50/150/613). Id Kotoba berupa string (`'k25-3' <= 50` → false),
+sehingga **hasilnya 0 kata** dan Game menampilkan "Belum ada kata".
+
+Perbaikan di `utils/kanjiGame.js` — cabang id non-angka memakai posisi array:
+
+```js
+if (items.some((it) => typeof it.id !== 'number')) {
+  return items.slice(0, maxId)   // Kotoba: level = N kata pertama
+}
+```
+
+Jalur kanji tetap identik. Diverifikasi: `buildPool(kotoba, 50)` = 50,
+`buildPool(kotoba, 613)` = 613.
+
+**⚠️ ATURAN WAJIB #6 — skor Game harus dipisah per jenis**
+
+Skor & riwayat Game disimpan per `levelId`. Kalau Kanji dan Kotoba sama-sama
+memakai `gampang`, skornya saling menimpa. `KanjiGame` sekarang memakai `keyOf`:
+
+```js
+const keyOf = (id) => (kind === 'kanji' ? id : `${kind}:${id}`)
+```
+
+**Kanji sengaja TANPA prefix** — supaya skor kanji yang sudah tersimpan di
+`kanji-hafalan-game-v1` (`{ gampang: 50 }`) tidak hilang setelah update ini.
+Jangan "merapikan" jadi `kanji:gampang`; itu akan menghapus skor pengguna lama.
+
+`totalScore` juga menyaring: kanji = kunci tanpa `:`, kotoba = berawalan `kotoba:`.
+Diverifikasi: `best` = `{ gampang: 50, "kotoba:gampang": 13 }` → Game Kanji
+menampilkan 50, Game Kotoba 13, tanpa saling menimpa.
+
+Data Kotoba untuk Kuis/Game dimuat lewat `hooks/useKotobaItems.js`
+(impor dinamis, diratakan dari `KOTOBA_BAB`). Jumlahnya untuk label diambil
+dari `data/kotobaTotal.js` — **jangan** impor `kotobaMinna.js` hanya untuk
+menghitung total, itu menarik 218 KB ke bundle awal.
+
 ### Persistensi Kotoba
 - `kanji-notebook:kotoba-bab` — bab terakhir (ingat setelah refresh).
 - `kanji-notebook:kotoba-index` — posisi kartu terakhir dalam bab.

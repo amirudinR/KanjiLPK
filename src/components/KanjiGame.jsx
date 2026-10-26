@@ -29,6 +29,9 @@ function KanjiGame({
   onSpeak,
   speechSupported = false,
   hasJapaneseVoice = false,
+  title = 'Game Kanji',
+  kind = 'kanji',
+  totalHint = 613,
 }) {
   const {
     results,
@@ -58,14 +61,27 @@ function KanjiGame({
   )
 
   // Bank kata level terpilih (urut). items datang dari prop (613 entri).
+  // Skor & riwayat dipisah per jenis (kanji / kotoba) lewat prefix level id,
+  // supaya skor kanji tidak tertimpa skor Kotoba. Kanji memakai id lama tanpa
+  // prefix agar skor yang sudah tersimpan tidak hilang.
+  const keyOf = useCallback(
+    (id) => (kind === 'kanji' ? id : `${kind}:${id}`),
+    [kind],
+  )
+
   const pool = useMemo(() => buildPool(items, level.maxId), [items, level.maxId])
   const totalSesi = sessionCount(pool.length)
-  const bestOfLevel = best[level.id] ?? 0
-  const sessionsDone = Object.keys(results[level.id] ?? {}).length
+  const bestOfLevel = best[keyOf(level.id)] ?? 0
+  const sessionsDone = Object.keys(results[keyOf(level.id)] ?? {}).length
 
   const totalScore = useMemo(
-    () => Object.values(best).reduce((n, v) => n + (v || 0), 0),
-    [best],
+    () =>
+      Object.entries(best)
+        .filter(([k]) =>
+          kind === 'kanji' ? !k.includes(':') : k.startsWith(`${kind}:`),
+        )
+        .reduce((n, [, v]) => n + (v || 0), 0),
+    [best, kind],
   )
 
   const start = useCallback(() => {
@@ -86,6 +102,10 @@ function KanjiGame({
           modes={MODES}
           level={level}
           mode={mode}
+          title={title}
+          kind={kind}
+          totalHint={totalHint}
+          keyOf={keyOf}
           onPickLevel={setLevelId}
           onPickMode={setModeId}
           onStart={start}
@@ -103,9 +123,11 @@ function KanjiGame({
 
       {phase === 'play' && (
         <Play
-          key={`${level.id}-${mode.id}-${sessionIdx}`}
+          key={`${kind}-${level.id}-${mode.id}-${sessionIdx}`}
           level={level}
           mode={mode}
+          kind={kind}
+          keyOf={keyOf}
           pool={pool}
           items={items}
           sessionIdx={sessionIdx}
@@ -129,6 +151,8 @@ function KanjiGame({
         <Result
           level={level}
           mode={mode}
+          kind={kind}
+          keyOf={keyOf}
           sessionIdx={sessionIdx}
           totalSesi={totalSesi}
           lastResult={lastResult}
@@ -155,6 +179,9 @@ function Menu({
   modes,
   level,
   mode,
+  title,
+  totalHint,
+  keyOf,
   onPickLevel,
   onPickMode,
   onStart,
@@ -168,7 +195,7 @@ function Menu({
   onClearHistory,
   onPlaySession,
 }) {
-  const levelResults = results[level.id] ?? {}
+  const levelResults = results[keyOf(level.id)] ?? {}
 
   return (
     <div className="kg-menu">
@@ -178,10 +205,10 @@ function Menu({
           遊
         </span>
         <div className="kg-hero-text">
-          <h2 className="kg-hero-title">Game Kanji</h2>
+          <h2 className="kg-hero-title">{title}</h2>
           <p className="kg-hero-sub">
-            Uji semua {poolSize} kosakata kanji. Pilih level &amp; mode, lalu
-            kerjakan soal per {SESSION_SIZE} dengan urutan asli.
+            Uji semua {poolSize} kosakata dari {totalHint} entri. Pilih level
+            &amp; mode, lalu kerjakan soal per {SESSION_SIZE} dengan urutan asli.
           </p>
         </div>
       </header>
@@ -203,7 +230,7 @@ function Menu({
         <div className="kg-grid kg-grid-levels">
           {levels.map((lv, i) => {
             const sel = lv.id === level.id
-            const done = Object.keys(results[lv.id] ?? {}).length
+            const done = Object.keys(results[keyOf(lv.id)] ?? {}).length
             return (
               <button
                 key={lv.id}
@@ -367,6 +394,8 @@ function Tag({ icon, text, accent }) {
 function Play({
   level,
   mode,
+  kind,
+  keyOf,
   pool,
   items,
   sessionIdx,
@@ -463,10 +492,11 @@ function Play({
       savedRef.current = true
       const now = Date.now()
       const result = { benar: correctCount, total, skor: score, at: now }
-      onSave(level.id, sessionIdx, result)
+      onSave(keyOf(level.id), sessionIdx, result)
       onHistory({
         ...result,
-        levelId: level.id,
+        kind,
+        levelId: keyOf(level.id),
         levelName: level.name,
         levelJp: level.jp,
         modeId: mode.id,
@@ -483,6 +513,8 @@ function Play({
     score,
     level,
     mode,
+    kind,
+    keyOf,
     sessionIdx,
     onSave,
     onHistory,
@@ -582,7 +614,7 @@ function Play({
         {/* Kartu soal */}
         <div className="kg-prompt">
           <span className="kg-prompt-label">
-            {mode.title} · No. {current.card.id}
+            {mode.title} · No. {sessionIdx * SESSION_SIZE + index + 1}
           </span>
           <span
             className={`kg-prompt-text ${
@@ -704,6 +736,7 @@ function Play({
 function Result({
   level,
   mode,
+  keyOf,
   sessionIdx,
   totalSesi,
   lastResult,
@@ -718,15 +751,15 @@ function Result({
 }) {
   // Utamakan hasil run terakhir (dioper langsung, anti-race); kalau tidak ada
   // (mis. halaman dibuka ulang), jatuh ke rekor tersimpan di store.
-  const r = lastResult ?? results[level.id]?.[sessionIdx]
+  const r = lastResult ?? results[keyOf(level.id)]?.[sessionIdx]
   const benar = r?.benar ?? 0
   const total = r?.total ?? 0
   const skor = r?.skor ?? 0
   const pct = total ? Math.round((benar / total) * 100) : 0
   const perfect = total > 0 && benar === total
   const hasNext = sessionIdx + 1 < totalSesi
-  const levelBest = best[level.id] ?? 0
-  const sessionsDone = Object.keys(results[level.id] ?? {}).length
+  const levelBest = best[keyOf(level.id)] ?? 0
+  const sessionsDone = Object.keys(results[keyOf(level.id)] ?? {}).length
 
   const [confirmReset, setConfirmReset] = useState(false)
 
@@ -810,7 +843,7 @@ function Result({
               type="button"
               className="kg-chip kg-chip-on"
               onClick={() => {
-                onResetLevel(level.id)
+                onResetLevel(keyOf(level.id))
                 setConfirmReset(false)
                 onMenu()
               }}
