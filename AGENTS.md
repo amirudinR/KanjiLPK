@@ -479,6 +479,67 @@ Hasil terverifikasi di lebar kartu 412px:
 | `入っています` | 6 | 288px | 1 |
 | `よろしくお願いします` | 10 | 353px | 1 |
 
+## Kotoba (Minna no Nihongo BAB 1–50) — catatan
+
+Halaman **terpisah** dari 613 kanji JFT. Tab `Kotoba`. **Jangan mencampur** data
+atau progres keduanya.
+
+### Sumber & jumlah
+- Sumber: `kotoba minna no nihonggo bab 1-50-1.pdf` (60 hlm, 50 bab, Agus Hinji).
+- **2.910 entri** hasil ekstraksi. 953 di antaranya tanpa kanji (kata serapan / kana).
+- File data: `src/data/kotobaMinna.js` → `KOTOBA_BAB = { 1: [...], ..., 50: [...] }`.
+
+### ⚠️ ATURAN WAJIB #1 — `id` harus ber-prefix `k`
+`id` berbentuk `k{bab}-{no}`, mis. `k25-3`. Prefix `k` **bukan kosmetik**:
+`useProgress` menyimpan progres per `id` di localStorage yang sama dengan kanji
+(id `1`–`613`). Tanpa prefix, progres kanji pengguna bisa tertimpa.
+
+Diverifikasi: menandai `k2-1` menghasilkan
+`{"1":"known","5":"known","k2-1":"known"}` — id kanji `1` dan `5` utuh.
+
+### ⚠️ ATURAN WAJIB #2 — data diimpor DINAMIS
+2.910 entri = 218 KB. Kalau diimpor statis di `App.jsx`, bundle awal membengkak
+untuk pengguna yang tidak membuka tab Kotoba. Pakai:
+
+```js
+import('../data/kotobaMinna.js').then((mod) => setData(mod.KOTOBA_BAB))
+```
+
+Hasil build yang benar: `kotobaMinna-*.js` jadi chunk **terpisah** (±218 KB),
+`index-*.js` tetap ±380 KB.
+
+### ⚠️ ATURAN WAJIB #3 — jangan pakai parser lama
+Ekstraksi PDF ini **gagal 3×** sebelum berhasil. Jangan ulangi:
+1. ❌ Split teks per baris → kolom bergeser (sel kosong dibuang PyMuPDF).
+2. ❌ Threshold posisi X → masih bergeser saat sel kosong.
+3. ❌ `zip()` 4 daftar sel → memotong daftar terpendek, data salah total.
+
+✅ Yang benar: `page.find_tables()` per halaman. Nomor bab ditentukan dari
+posisi **Y judul `BAB n`** karena **bab tidak selalu mulai di halaman baru**
+(hlm. 23 berisi akhir BAB 18 + awal BAB 19).
+
+### Komponen
+- `Kotoba.jsx` — pemilih 50 bab + delegasi ke `Flashcard` yang sudah ada.
+- **Nol CSS baru.** Kelas yang dipakai ulang: `.allwords-title`,
+  `.allwords-filter-btn`, `.allwords-empty`.
+- `Flashcard`, `FlashcardFront/Back`, `JumpList`, `Controls` dipakai **tanpa
+  modifikasi** karena bentuk data sama: `{ id, kata, baca, arti }`.
+- Bab terakhir disimpan di localStorage `kanji-notebook:kotoba-bab`.
+
+### Terverifikasi (desktop 1282px & mobile 502px)
+| Uji | Hasil |
+|---|---|
+| 6 tab tidak terpotong | ✅ (`navScrollWidth == clientWidth`) |
+| 50 tombol bab | ✅ |
+| BAB 2 = 45 kartu | ✅ |
+| `こちらこそよろしくおねがいします` (16 char) | ✅ 1 baris — 422px/551px desktop, 348px/407px mobile |
+| Kartu bisa dibalik | ✅ bacaan + arti tampil |
+| Tombol accordion `Contoh` bisa diklik | ✅ 425px, `clickable: true` |
+| Scroll sisi belakang | ✅ `scrollHeight > clientHeight` |
+| Progres kanji tidak rusak | ✅ lihat aturan #1 |
+
+---
+
 ### Regresi yang HARUS diuji ulang setelah menyentuh flashcard
 
 Setelah mengubah `flashcard.css`, `responsive.css`, atau `Flashcard.jsx`, uji:
