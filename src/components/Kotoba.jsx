@@ -3,6 +3,16 @@ import Flashcard from './Flashcard.jsx'
 import Icon from './Icon.jsx'
 
 const BAB_KEY = 'kanji-notebook:kotoba-bab'
+const INDEX_KEY = 'kanji-notebook:kotoba-index'
+
+function readIndex() {
+  try {
+    const n = Number(localStorage.getItem(INDEX_KEY))
+    return Number.isInteger(n) && n >= 0 ? n : 0
+  } catch {
+    return 0
+  }
+}
 
 /**
  * Halaman Kotoba — kosakata Minna no Nihongo, dipilih per bab.
@@ -25,7 +35,7 @@ function Kotoba({
     }
   })
   const [data, setData] = useState(null)
-  const [index, setIndex] = useState(0)
+  const [index, setIndex] = useState(readIndex)
 
   useEffect(() => {
     let alive = true
@@ -37,6 +47,15 @@ function Kotoba({
     }
   }, [])
 
+  // Simpan posisi kartu agar refresh tidak balik ke kartu pertama.
+  useEffect(() => {
+    try {
+      localStorage.setItem(INDEX_KEY, String(index))
+    } catch {
+      /* localStorage tak tersedia — abaikan */
+    }
+  }, [index])
+
   const items = useMemo(
     () => (data && bab ? (data[bab] ?? []) : []),
     [data, bab],
@@ -47,6 +66,17 @@ function Kotoba({
     setIndex(0)
     try {
       localStorage.setItem(BAB_KEY, String(n))
+    } catch {
+      /* localStorage tak tersedia — abaikan */
+    }
+  }
+
+  // Keluar ke pemilih bab harus menetap, bukan kembali ke bab lama saat refresh.
+  const backToPicker = () => {
+    setBab(null)
+    setIndex(0)
+    try {
+      localStorage.removeItem(BAB_KEY)
     } catch {
       /* localStorage tak tersedia — abaikan */
     }
@@ -93,7 +123,7 @@ function Kotoba({
       <button
         type="button"
         className="allwords-filter-btn"
-        onClick={() => setBab(null)}
+        onClick={backToPicker}
         style={{ marginBottom: 12 }}
       >
         ← Pilih bab lain

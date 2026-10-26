@@ -194,7 +194,10 @@ export function useProgress(totalItems = 0) {
   const counts = useMemo(() => {
     let known = 0
     let learning = 0
-    for (const status of Object.values(progress)) {
+    for (const [id, status] of Object.entries(progress)) {
+      // Id kanji selalu angka; id Kotoba ber-prefix "k" (k1-1) dan tidak
+      // boleh ikut dihitung karena `total` hanya jumlah kanji.
+      if (!/^\d+$/.test(id)) continue
       if (status === STATUS.KNOWN) known += 1
       else if (status === STATUS.LEARNING) learning += 1
     }

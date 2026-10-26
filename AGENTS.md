@@ -526,6 +526,38 @@ posisi **Y judul `BAB n`** karena **bab tidak selalu mulai di halaman baru**
   modifikasi** karena bentuk data sama: `{ id, kata, baca, arti }`.
 - Bab terakhir disimpan di localStorage `kanji-notebook:kotoba-bab`.
 
+### ⚠️ ATURAN WAJIB #4 — `counts` HARUS menyaring id non-angka
+
+`useProgress.counts` menghitung dari **seluruh** `progress`, sedangkan `total`
+hanya jumlah kanji (613). Sebelum diperbaiki, menandai 1 entri Kotoba membuat
+penghitung kanji turun: `Sisa 610` padahal seharusnya `611`, dan badge progres
+jadi meleset. Ini **bukan** bug lama — muncul saat data Kotoba masuk ke
+localStorage yang sama.
+
+Perbaikan di `useProgress.js`:
+
+```js
+for (const [id, status] of Object.entries(progress)) {
+  if (!/^\d+$/.test(id)) continue   // id kanji selalu angka; Kotoba ber-prefix "k"
+  ...
+}
+```
+
+**Jangan hapus baris `continue` ini.** Kalau kelak ada sumber data baru, beri
+prefix selain angka dan filter serupa, jangan mengandalkan `counts` apa adanya.
+
+Diverifikasi: `{1:known, 2:known, 3:learning, k1-1:known, k2-5:known}`
+→ Dashboard "2 hafal, 1 belajar, 611 belum", strip "Sisa 611". Benar.
+
+Ekspor/impor progres **sengaja** tetap membawa id Kotoba (ikut ter-backup);
+aman karena penghitung sudah menyaring.
+
+### Persistensi Kotoba
+- `kanji-notebook:kotoba-bab` — bab terakhir (ingat setelah refresh).
+- `kanji-notebook:kotoba-index` — posisi kartu terakhir dalam bab.
+- Tombol "← Pilih bab lain" **menghapus** `kotoba-bab`, supaya keluar ke
+  pemilih bab tetap bertahan setelah refresh (dulu tidak dihapus → balik lagi).
+
 ### Terverifikasi (desktop 1282px & mobile 502px)
 | Uji | Hasil |
 |---|---|
